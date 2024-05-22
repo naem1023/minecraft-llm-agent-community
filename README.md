@@ -29,6 +29,24 @@ npm install mineflayer
 ```sh
 conda create -n mw python=3.9 -y
 conda activate mw
-pip install poetry
-poetry install
+make install
+```
+
+# Contribution
+## Check lint
+```sh
+make pre-commit
+```
+
+# Citation
+
+If you find our work useful, please consider citing us! 
+
+```bibtex
+@article{wang2023voyager,
+  title   = {Voyager: An Open-Ended Embodied Agent with Large Language Models},
+  author  = {Guanzhi Wang and Yuqi Xie and Yunfan Jiang and Ajay Mandlekar and Chaowei Xiao and Yuke Zhu and Linxi Fan and Anima Anandkumar},
+  year    = {2023},
+  journal = {arXiv preprint arXiv: Arxiv-2305.16291}
+}
 ```
