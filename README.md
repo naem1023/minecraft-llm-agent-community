@@ -5,6 +5,9 @@
 - [ ] Make single agent using Voyager baseline
 
 ## Installation Guides
+### Prepare JDK 21>=
+- For example, donwload the installation file from [https://www.oracle.com/java/technologies/downloads/#jdk22-mac](https://www.oracle.com/java/technologies/downloads/#jdk22-mac).
+
 ### Download and Run Fabric Minecraft Server Launcher on local
 ```sh
 chmod 751 scritps/run*.sh
