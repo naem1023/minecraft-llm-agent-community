@@ -35,9 +35,6 @@ make pre-commit
 ```
 
 # Citation
-
-If you find our work useful, please consider citing us! 
-
 ```bibtex
 @article{wang2023voyager,
   title   = {Voyager: An Open-Ended Embodied Agent with Large Language Models},
