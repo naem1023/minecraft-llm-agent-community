@@ -5,7 +5,7 @@
 - [ ] Make single agent using Voyager baseline
 
 ## Installation Guides
-### Download and Run Server
+### Download and Run Fabric Minecraft Server Launcher on local
 ```sh
 chmod 751 scritps/run_server.sh
 scritps/run_server.sh
