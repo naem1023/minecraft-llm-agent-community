@@ -20,18 +20,27 @@ Set the x y z position on the server command
 ```
 /setworldspawn ~ ~ ~
 ```
-
-### Install mineflayer
-```sh
-npm install mineflayer
-```
-
 ### Make python environment
 ```sh
 conda create -n mw python=3.9 -y
 conda activate mw
 make install
 ```
+
+### Install mineflayer and additional minecraft interface library
+```sh
+npm install mineflayer
+
+cd voyager/env/mineflayers
+npm install -g npx
+npm install
+cd mineflayer-collectblock
+npm install
+npx tsc
+cd ..
+npm install
+```
+
 
 # Contribution
 ## Check lint
