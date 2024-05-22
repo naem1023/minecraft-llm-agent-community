@@ -7,7 +7,12 @@
 ## Installation Guides
 ### Download and Run Fabric Minecraft Server Launcher on local
 ```sh
-chmod 751 scritps/run_server.sh
+chmod 751 scritps/run*.sh
+
+# If a server isn't installed 
+scritps/download_run_server.sh
+
+# IF a server is already install 
 scritps/run_server.sh
 ```
 ### Set world spawn
