@@ -5,6 +5,11 @@
 - [ ] Make single agent using Voyager baseline
 
 ## Installation Guides
+### Dependenceis
+- Pyhton: v3.9
+- Node: v18
+- (Optional) Minecraft client launcher: v1.19.2
+
 ### Prepare JDK 21>=
 - For example, donwload the installation file from [https://www.oracle.com/java/technologies/downloads/#jdk22-mac](https://www.oracle.com/java/technologies/downloads/#jdk22-mac).
 
@@ -18,10 +23,12 @@ scritps/download_run_server.sh
 # IF a server is already install 
 scritps/run_server.sh
 ```
-### Set world spawn
+### Set world
+- seed: scritps/run_server.sh
+- coordinate: 63 94 ~
 Set the x y z position on the server command
 ```
-/setworldspawn ~ ~ ~
+/setworldspawn 63 94 168
 ```
 ### Make python environment
 ```sh
