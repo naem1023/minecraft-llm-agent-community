@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "minecraft-world"
+name = "minecraft-llm-agent-community"
 version = "0.1.0"
 description = ""
 authors = ["naem1023 <relilau00@gmail.com>"]
