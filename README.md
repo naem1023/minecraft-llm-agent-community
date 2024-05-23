@@ -1,8 +1,14 @@
-# minecraft_world
+# ⛏️ minecraft_world
 
+This project aims to observe how agents in the Minecraft world autonomously form groups and create villages. It is still in its early stages, and if valuable insights can be derived, it will be used as a research topic.
+
+This project seeks to expand the research to include how multi-agents form groups, in addition to autonomously learning skills and exploring items, similar to [Voyager](https://github.com/MineDojo/Voyager).
+
+## TODO 
 - [ ] Basic Environment Setup using Voyager baseline
 - [ ] Setup local llm via vllm or text-generation-inference
 - [ ] Make single agent using Voyager baseline
+- [ ] Make simple multi agent 
 
 ## Installation Guides
 ### Dependenceis
