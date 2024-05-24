@@ -21,7 +21,7 @@ This project seeks to expand the research to include how multi-agents form group
 
 ### Download and Run Fabric Minecraft Server Launcher on local
 ```sh
-chmod 751 scritps/run*.sh
+chmod 751 scritps/*run*.sh
 
 # If a server isn't installed 
 scritps/download_run_server.sh
@@ -30,11 +30,22 @@ scritps/download_run_server.sh
 scritps/run_server.sh
 ```
 ### Set world
-- seed: scritps/run_server.sh
-- coordinate: 63 94 ~
+- seed: 637184628307790
+- coordinate: 63 94 168
 Set the x y z position on the server command
 ```
 /setworldspawn 63 94 168
+```
+
+server.properties
+```txt
+difficulty=peaceful
+gamemode=survival
+online-mode=false
+enable-rcon=true # Only needed if you wish to use RCON features
+rcon.password=hunter2
+rcon.port=25575
+spawn-protection=0 # This is important, otherwise the bot can't do anything near the spawn
 ```
 ### Make python environment
 ```sh
@@ -47,7 +58,7 @@ make install
 ```sh
 npm install mineflayer
 
-cd voyager/env/mineflayers
+cd voyager/env/mineflayer
 npm install -g npx
 npm install
 cd mineflayer-collectblock
@@ -57,6 +68,10 @@ cd ..
 npm install
 ```
 
+# Test
+```sh
+
+```
 
 # Contribution
 ## Check lint

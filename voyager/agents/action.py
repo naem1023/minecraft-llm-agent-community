@@ -6,9 +6,16 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts import SystemMessagePromptTemplate
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
-import voyager.utils as U
 from voyager.control_primitives_context import load_control_primitives_context
 from voyager.prompts import load_prompt
+from voyager.utils.file_utils import f_exists, f_join, f_mkdir
+from voyager.utils.json_utils import (
+    dump_json,
+    json_dump,
+    json_dumps,
+    json_load,
+    load_json,
+)
 
 
 class ActionAgent:
@@ -25,10 +32,10 @@ class ActionAgent:
         self.ckpt_dir = ckpt_dir
         self.chat_log = chat_log
         self.execution_error = execution_error
-        U.f_mkdir(f"{ckpt_dir}/action")
+        f_mkdir(f"{ckpt_dir}/action")
         if resume:
             print(f"\033[32mLoading Action Agent from {ckpt_dir}/action\033[0m")
-            self.chest_memory = U.load_json(f"{ckpt_dir}/action/chest_memory.json")
+            self.chest_memory = load_json(f"{ckpt_dir}/action/chest_memory.json")
         else:
             self.chest_memory = {}
         self.llm = ChatOpenAI(
@@ -53,7 +60,7 @@ class ActionAgent:
                         f"\033[32mAction Agent saving chest {position}: {chest}\033[0m"
                     )
                     self.chest_memory[position] = chest
-        U.dump_json(self.chest_memory, f"{self.ckpt_dir}/action/chest_memory.json")
+        dump_json(self.chest_memory, f"{self.ckpt_dir}/action/chest_memory.json")
 
     def render_chest_observation(self):
         chests = []

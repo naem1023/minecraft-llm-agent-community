@@ -8,7 +8,14 @@ import gymnasium as gym
 import requests
 from gymnasium.core import ObsType
 
-import voyager.utils as U
+from voyager.utils.file_utils import f_exists, f_join, f_mkdir, load_text
+from voyager.utils.json_utils import (
+    dump_json,
+    json_dump,
+    json_dumps,
+    json_load,
+    load_json,
+)
 
 from .minecraft_launcher import MinecraftInstance
 from .process_monitor import SubprocessMonitor
@@ -47,26 +54,26 @@ class VoyagerEnv(gym.Env):
         self.server_paused = False
 
     def get_mineflayer_process(self, server_port):
-        U.f_mkdir(self.log_path, "mineflayer")
+        f_mkdir(self.log_path, "mineflayer")
         file_path = os.path.abspath(os.path.dirname(__file__))
         return SubprocessMonitor(
             commands=[
                 "node",
-                U.f_join(file_path, "mineflayer/index.js"),
+                f_join(file_path, "mineflayer/index.js"),
                 str(server_port),
             ],
             name="mineflayer",
             ready_match=r"Server started on port (\d+)",
-            log_path=U.f_join(self.log_path, "mineflayer"),
+            log_path=f_join(self.log_path, "mineflayer"),
         )
 
     def get_mc_instance(self):
         print("Creating Minecraft server")
-        U.f_mkdir(self.log_path, "minecraft")
+        f_mkdir(self.log_path, "minecraft")
         return MinecraftInstance(
             **self.azure_login,
             mineflayer=self.mineflayer,
-            log_path=U.f_join(self.log_path, "minecraft"),
+            log_path=f_join(self.log_path, "minecraft"),
         )
 
     def check_process(self):

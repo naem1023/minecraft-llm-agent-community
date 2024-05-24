@@ -2,7 +2,14 @@ import os
 
 import pkg_resources
 
-import voyager.utils as U
+from voyager.utils.file_utils import f_exists, f_join, f_mkdir, load_text
+from voyager.utils.json_utils import (
+    dump_json,
+    json_dump,
+    json_dumps,
+    json_load,
+    load_json,
+)
 
 
 def load_control_primitives(primitive_names=None):
@@ -14,7 +21,7 @@ def load_control_primitives(primitive_names=None):
             if primitives.endswith(".js")
         ]
     primitives = [
-        U.load_text(f"{package_path}/control_primitives/{primitive_name}.js")
+        load_text(f"{package_path}/control_primitives/{primitive_name}.js")
         for primitive_name in primitive_names
     ]
     return primitives
