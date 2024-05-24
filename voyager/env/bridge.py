@@ -26,7 +26,7 @@ class VoyagerEnv(gym.Env):
         self,
         mc_port=None,
         azure_login=None,
-        server_host="http://127.0.0.1",
+        server_host="http://localhost",
         server_port=3000,
         request_timeout=600,
         log_path="./logs",
