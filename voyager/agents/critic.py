@@ -1,5 +1,6 @@
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.system import SystemMessage
+from langchain_openai import ChatOpenAI
 
 from voyager.prompts import load_prompt
 from voyager.utils.json_utils import fix_and_parse_json

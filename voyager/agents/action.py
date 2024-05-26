@@ -2,9 +2,11 @@ import re
 import time
 
 from javascript import require
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import SystemMessagePromptTemplate
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages.ai import AIMessage
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.system import SystemMessage
+from langchain_core.prompts.chat import SystemMessagePromptTemplate
+from langchain_openai import ChatOpenAI
 
 from voyager.control_primitives_context import load_control_primitives_context
 from voyager.prompts import load_prompt

@@ -1,9 +1,10 @@
 import os
 
-from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.schema import HumanMessage, SystemMessage
-from langchain.vectorstores import Chroma
+from langchain_chroma import Chroma
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.system import SystemMessage
+from langchain_openai import ChatOpenAI
+from langchain_openai.embeddings import OpenAIEmbeddings
 
 from voyager.control_primitives import load_control_primitives
 from voyager.prompts import load_prompt
@@ -40,7 +41,7 @@ class SkillManager:
         self.ckpt_dir = ckpt_dir
         self.vectordb = Chroma(
             collection_name="skill_vectordb",
-            embedding_function=OpenAIEmbeddings(),
+            embedding_function=OpenAIEmbeddings(model="text-embedding-3-small"),
             persist_directory=f"{ckpt_dir}/skill/vectordb",
         )
         assert self.vectordb._collection.count() == len(self.skills), (
@@ -96,7 +97,9 @@ class SkillManager:
             f"{self.ckpt_dir}/skill/description/{dumped_program_name}.txt",
         )
         dump_json(self.skills, f"{self.ckpt_dir}/skill/skills.json")
-        self.vectordb.persist()
+
+        # After langchain major version, persist() is not needed if you specify persist_directory.
+        # self.vectordb.persist()
 
     def generate_skill_description(self, program_name, program_code):
         messages = [

@@ -160,3 +160,4 @@ cython_debug/
 bin/
 node_modules/
 poetry.lock
+ckpt/
