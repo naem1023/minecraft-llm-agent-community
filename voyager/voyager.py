@@ -214,16 +214,26 @@ class Voyager:
         self.conversations.append(
             (self.messages[0].content, self.messages[1].content, ai_message.content)
         )
+
+        # Parse the AI message and extract the program code to execute immediately
         parsed_result = self.action_agent.process_ai_message(message=ai_message)
         success = False
         if isinstance(parsed_result, dict):
             code = parsed_result["program_code"] + "\n" + parsed_result["exec_code"]
+
+            # Take a step. The code is executed in the Minecraft environment
             events = self.env.step(
                 code,
                 programs=self.skill_manager.programs,
             )
+
+            # Record the events to the event recorder
             self.recorder.record(events, self.task)
+
+            # Update the chest(inventory) memory of the action agent
             self.action_agent.update_chest_memory(events[-1][1]["nearbyChests"])
+
+            # Check if the task is successful via the critic agent
             success, critique = self.critic_agent.check_task_success(
                 events=events,
                 task=self.task,
@@ -248,6 +258,8 @@ class Voyager:
                 )
                 events[-1][1]["inventory"] = new_events[-1][1]["inventory"]
                 events[-1][1]["voxels"] = new_events[-1][1]["voxels"]
+
+            # Retrieve the skill from db. 
             new_skills = self.skill_manager.retrieve_skills(
                 query=self.context
                 + "\n\n"
@@ -322,6 +334,10 @@ class Voyager:
             if self.recorder.iteration > self.max_iterations:
                 print("Iteration limit reached")
                 break
+            """
+            Propose next task by the curriculum agent.
+            It can suggest using LLM or heuristic rules.
+            """
             task, context = self.curriculum_agent.propose_next_task(
                 events=self.last_events,
                 chest_observation=self.action_agent.render_chest_observation(),
