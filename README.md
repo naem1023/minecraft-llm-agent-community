@@ -4,11 +4,11 @@ This project aims to observe how agents in the Minecraft world autonomously form
 
 This project seeks to expand the research to include how multi-agents form groups, in addition to autonomously learning skills and exploring items, similar to [Voyager](https://github.com/MineDojo/Voyager).
 
-<div style="display: flex;">
-  <div style="flex: 1;">
+<div style="display: flex; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 300px;">
     <img src="assets/cover-image.jpeg" alt="Description" style="max-width: 100%; height: auto;">
   </div>
-  <div style="flex: 1; padding-left: 20px;">
+  <div style="flex: 1; padding-left: 20px;min-width: 300px;">
     <p>
       The purpose of this project is subject to change, and we welcome diverse opinions and feedback. Currently, we are focusing on observing how issues of cooperation, coexistence, and survival are resolved. Additionally, most of our resources are currently invested in setting up the Minecraft environment, which has slowed the progress of core functionality development.
     </p>
