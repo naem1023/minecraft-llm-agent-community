@@ -15,7 +15,6 @@ This project seeks to expand the research to include how multi-agents form group
 ### Dependenceis
 - Pyhton: v3.9
 - Node: v18
-- (Optional) Minecraft client launcher: v1.19.2
 
 ### Prepare JDK 21>=
 - For example, donwload the installation file from [https://www.oracle.com/java/technologies/downloads/#jdk22-mac](https://www.oracle.com/java/technologies/downloads/#jdk22-mac).
@@ -49,7 +48,7 @@ rcon.port=25575
 spawn-protection=0 # This is important, otherwise the bot can't do anything near the spawn
 ```
 ### Prepare minecraft mods for client
-Check the [fabric mods installation document](installation/fabric_mods_install.md)
+- Check the [fabric mods installation document](installation/fabric_mods_install.md)
 ### Make python environment
 ```sh
 conda create -n mw python=3.9 -y
