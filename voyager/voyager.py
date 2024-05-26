@@ -3,10 +3,10 @@ import os
 import time
 from typing import Dict
 
-import voyager.utils as U
-
-from .agents import ActionAgent, CriticAgent, CurriculumAgent, SkillManager
-from .env import VoyagerEnv
+from voyager.agents import ActionAgent, CriticAgent, CurriculumAgent, SkillManager
+from voyager.env import VoyagerEnv
+from voyager.utils.json_utils import json_dumps
+from voyager.utils.record_utils import EventRecorder
 
 
 # TODO: remove event memory
@@ -22,12 +22,12 @@ class Voyager:
         env_request_timeout: int = 600,
         max_iterations: int = 160,
         reset_placed_if_failed: bool = False,
-        action_agent_model_name: str = "gpt-4",
+        action_agent_model_name: str = "gpt-3.5-turbo",
         action_agent_temperature: float = 0,
         action_agent_task_max_retries: int = 4,
         action_agent_show_chat_log: bool = True,
         action_agent_show_execution_error: bool = True,
-        curriculum_agent_model_name: str = "gpt-4",
+        curriculum_agent_model_name: str = "gpt-3.5-turbo",
         curriculum_agent_temperature: float = 0,
         curriculum_agent_qa_model_name: str = "gpt-3.5-turbo",
         curriculum_agent_qa_temperature: float = 0,
@@ -35,7 +35,7 @@ class Voyager:
         curriculum_agent_core_inventory_items: str = r".*_log|.*_planks|stick|crafting_table|furnace"
         r"|cobblestone|dirt|coal|.*_pickaxe|.*_sword|.*_axe",
         curriculum_agent_mode: str = "auto",
-        critic_agent_model_name: str = "gpt-4",
+        critic_agent_model_name: str = "gpt-3.5-turbo",
         critic_agent_temperature: float = 0,
         critic_agent_mode: str = "auto",
         skill_manager_model_name: str = "gpt-3.5-turbo",
@@ -152,7 +152,7 @@ class Voyager:
             ckpt_dir=skill_library_dir if skill_library_dir else ckpt_dir,
             resume=True if resume or skill_library_dir else False,
         )
-        self.recorder = U.EventRecorder(ckpt_dir=ckpt_dir, resume=resume)
+        self.recorder = EventRecorder(ckpt_dir=ckpt_dir, resume=resume)
         self.resume = resume
 
         # init variables for rollout
@@ -238,7 +238,7 @@ class Voyager:
                         blocks.append(block)
                         positions.append(position)
                 new_events = self.env.step(
-                    f"await givePlacedItemBack(bot, {U.json_dumps(blocks)}, {U.json_dumps(positions)})",
+                    f"await givePlacedItemBack(bot, {json_dumps(blocks)}, {json_dumps(positions)})",
                     programs=self.skill_manager.programs,
                 )
                 events[-1][1]["inventory"] = new_events[-1][1]["inventory"]

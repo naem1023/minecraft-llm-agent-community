@@ -11,11 +11,14 @@ java -Xmx2G -jar fabric-server-mc.1.19.2-loader.0.15.11-launcher.1.0.1.jar nogui
 
 # eula=false to true
 eula_path="eula.txt"
+NEW_SEED="637184628307790"
 sed -i'' -e 's/eula=false/eula=true/' "$eula_path"
 
 # Set difficulty to peaceful
 server_properties="server.properties"
 sed -i'' -e 's/^difficulty=.*/difficulty=peaceful/' "$server_properties"
+sed -i'' -e "s/^level-seed=.*/level-seed=$NEW_SEED/" "$server_properties"
+sed -i'' -e "s/^online-mode=.*/online-mode=false/" "$server_properties"
 
 # Run server again
 java -Xmx2G -jar fabric-server-mc.1.19.2-loader.0.15.11-launcher.1.0.1.jar nogui

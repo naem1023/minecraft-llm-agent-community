@@ -5,9 +5,10 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import HumanMessage, SystemMessage
 from langchain.vectorstores import Chroma
 
-import voyager.utils as U
 from voyager.control_primitives import load_control_primitives
 from voyager.prompts import load_prompt
+from voyager.utils.file_utils import dump_text, f_mkdir
+from voyager.utils.json_utils import dump_json, load_json
 
 
 class SkillManager:
@@ -25,14 +26,14 @@ class SkillManager:
             temperature=temperature,
             request_timeout=request_timout,
         )
-        U.f_mkdir(f"{ckpt_dir}/skill/code")
-        U.f_mkdir(f"{ckpt_dir}/skill/description")
-        U.f_mkdir(f"{ckpt_dir}/skill/vectordb")
+        f_mkdir(f"{ckpt_dir}/skill/code")
+        f_mkdir(f"{ckpt_dir}/skill/description")
+        f_mkdir(f"{ckpt_dir}/skill/vectordb")
         # programs for env execution
         self.control_primitives = load_control_primitives()
         if resume:
             print(f"\033[33mLoading Skill Manager from {ckpt_dir}/skill\033[0m")
-            self.skills = U.load_json(f"{ckpt_dir}/skill/skills.json")
+            self.skills = load_json(f"{ckpt_dir}/skill/skills.json")
         else:
             self.skills = {}
         self.retrieval_top_k = retrieval_top_k
@@ -89,14 +90,12 @@ class SkillManager:
         assert self.vectordb._collection.count() == len(
             self.skills
         ), "vectordb is not synced with skills.json"
-        U.dump_text(
-            program_code, f"{self.ckpt_dir}/skill/code/{dumped_program_name}.js"
-        )
-        U.dump_text(
+        dump_text(program_code, f"{self.ckpt_dir}/skill/code/{dumped_program_name}.js")
+        dump_text(
             skill_description,
             f"{self.ckpt_dir}/skill/description/{dumped_program_name}.txt",
         )
-        U.dump_json(self.skills, f"{self.ckpt_dir}/skill/skills.json")
+        dump_json(self.skills, f"{self.ckpt_dir}/skill/skills.json")
         self.vectordb.persist()
 
     def generate_skill_description(self, program_name, program_code):

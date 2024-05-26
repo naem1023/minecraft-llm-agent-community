@@ -4,7 +4,8 @@ import sys
 
 import minecraft_launcher_lib
 
-import voyager.utils as U
+from voyager.utils.file_utils import f_exists, f_join, f_mkdir
+from voyager.utils.json_utils import json_dump, json_load
 
 from .process_monitor import SubprocessMonitor
 
@@ -46,22 +47,22 @@ class MinecraftInstance:
         )
 
     def get_mineflayer_process(self, server_port):
-        U.f_mkdir(self.log_path, "../mineflayer")
+        f_mkdir(self.log_path, "../mineflayer")
         file_path = os.path.abspath(os.path.dirname(__file__))
         return SubprocessMonitor(
             commands=[
                 "node",
-                U.f_join(file_path, "mineflayer/index.js"),
+                f_join(file_path, "mineflayer/index.js"),
                 str(server_port),
             ],
             name="mineflayer",
             ready_match=r"Server started on port (\d+)",
-            log_path=U.f_join(self.log_path, "mineflayer"),
+            log_path=f_join(self.log_path, "mineflayer"),
         )
 
     def get_mc_command(self):
         file_path = os.path.abspath(os.path.dirname(__file__))
-        if not U.f_exists(file_path, "config.json"):
+        if not f_exists(file_path, "config.json"):
             (
                 login_url,
                 state,
@@ -100,10 +101,10 @@ class MinecraftInstance:
                 "uuid": login_data["id"],
                 "token": login_data["access_token"],
             }
-            U.json_dump(options, file_path, "config.json")
-            print(f"Login success, save to {U.f_join(file_path, 'config.json')}")
+            json_dump(options, file_path, "config.json")
+            print(f"Login success, save to {f_join(file_path, 'config.json')}")
 
-        options = U.json_load(file_path, "config.json")
+        options = json_load(file_path, "config.json")
         mc_command = minecraft_launcher_lib.command.get_minecraft_command(
             self.version, self.mc_dir, options
         )

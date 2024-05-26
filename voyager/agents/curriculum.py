@@ -8,9 +8,9 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import HumanMessage, SystemMessage
 from langchain.vectorstores import Chroma
 
-import voyager.utils as U
 from voyager.prompts import load_prompt
-from voyager.utils.json_utils import fix_and_parse_json
+from voyager.utils.file_utils import f_mkdir
+from voyager.utils.json_utils import dump_json, fix_and_parse_json, load_json
 
 
 class CurriculumAgent:
@@ -43,14 +43,14 @@ class CurriculumAgent:
         ], f"mode {mode} not supported"
         self.mode = mode
         self.ckpt_dir = ckpt_dir
-        U.f_mkdir(f"{ckpt_dir}/curriculum/vectordb")
+        f_mkdir(f"{ckpt_dir}/curriculum/vectordb")
         if resume:
             print(f"\033[35mLoading Curriculum Agent from {ckpt_dir}/curriculum\033[0m")
-            self.completed_tasks = U.load_json(
+            self.completed_tasks = load_json(
                 f"{ckpt_dir}/curriculum/completed_tasks.json"
             )
-            self.failed_tasks = U.load_json(f"{ckpt_dir}/curriculum/failed_tasks.json")
-            self.qa_cache = U.load_json(f"{ckpt_dir}/curriculum/qa_cache.json")
+            self.failed_tasks = load_json(f"{ckpt_dir}/curriculum/failed_tasks.json")
+            self.qa_cache = load_json(f"{ckpt_dir}/curriculum/qa_cache.json")
         else:
             self.completed_tasks = []
             self.failed_tasks = []
@@ -362,10 +362,10 @@ class CurriculumAgent:
         self.failed_tasks = updated_failed_tasks
 
         # dump to json
-        U.dump_json(
+        dump_json(
             self.completed_tasks, f"{self.ckpt_dir}/curriculum/completed_tasks.json"
         )
-        U.dump_json(self.failed_tasks, f"{self.ckpt_dir}/curriculum/failed_tasks.json")
+        dump_json(self.failed_tasks, f"{self.ckpt_dir}/curriculum/failed_tasks.json")
 
     def decompose_task(self, task, events):
         messages = [
@@ -408,7 +408,7 @@ class CurriculumAgent:
             self.qa_cache_questions_vectordb.add_texts(
                 texts=[question],
             )
-            U.dump_json(self.qa_cache, f"{self.ckpt_dir}/curriculum/qa_cache.json")
+            dump_json(self.qa_cache, f"{self.ckpt_dir}/curriculum/qa_cache.json")
             self.qa_cache_questions_vectordb.persist()
             questions.append(question)
             answers.append(answer)
@@ -429,7 +429,7 @@ class CurriculumAgent:
             self.qa_cache_questions_vectordb.add_texts(
                 texts=[question],
             )
-            U.dump_json(self.qa_cache, f"{self.ckpt_dir}/curriculum/qa_cache.json")
+            dump_json(self.qa_cache, f"{self.ckpt_dir}/curriculum/qa_cache.json")
             self.qa_cache_questions_vectordb.persist()
         context = f"Question: {question}\n{answer}"
         return context

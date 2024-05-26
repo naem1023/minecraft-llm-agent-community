@@ -5,7 +5,7 @@ SHELL = bash
 .ONESHELL:
 install:
 	pip install poetry
-	poetry install --with dev
+	poetry install --with dev --no-root
 
 .ONESHELL:
 pre-commit:

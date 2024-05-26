@@ -1,8 +1,3 @@
-ci:
-  autoupdate_commit_msg: "chore: update pre-commit hooks"
-  autofix_commit_msg: "style: pre-commit fixes"
-
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
@@ -41,6 +36,8 @@ repos:
             "--remove-unused-variables",
             "--remove-all-unused-imports",
             "--config=.conf/autoflake.cfg",
+            "--in-place",
+            "--recursive"
           ]
 
 # exclude: >
