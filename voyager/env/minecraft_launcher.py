@@ -5,7 +5,7 @@ import sys
 import minecraft_launcher_lib
 
 from voyager.utils.file_utils import f_exists, f_join, f_mkdir
-from voyager.utils.json_utils import json_dump, json_dumps, json_load
+from voyager.utils.json_utils import json_dump, json_load
 
 from .process_monitor import SubprocessMonitor
 

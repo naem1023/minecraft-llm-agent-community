@@ -101,12 +101,18 @@ app.post("/start", (req, res) => {
         const pvp = require("mineflayer-pvp").plugin;
         const minecraftHawkEye = require("minecrafthawkeye");
 
-        console.log("Loading mincraftHawkEye: ", minecraftHawkEye);
+        console.log(typeof minecraftHawkEye);
+        console.log(Object.prototype.toString.call(minecraftHawkEye));
+
+        console.log(typeof pvp);
+        console.log(Object.prototype.toString.call(pvp));
+
+
+        bot.loadPlugin(minecraftHawkEye.default);
         bot.loadPlugin(pathfinder);
         bot.loadPlugin(tool);
         bot.loadPlugin(collectBlock);
         bot.loadPlugin(pvp);
-        bot.loadPlugin(minecraftHawkEye);
 
         // bot.collectBlock.movements.digCost = 0;
         // bot.collectBlock.movements.placeCost = 0;

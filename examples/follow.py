@@ -1,4 +1,4 @@
-from javascript import AsyncTask, On, Once, off, once, require
+from javascript import On, require
 
 mineflayer = require("mineflayer")
 pathfinder = require("mineflayer-pathfinder").pathfinder

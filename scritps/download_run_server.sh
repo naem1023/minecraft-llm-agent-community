@@ -18,6 +18,7 @@ sed -i'' -e 's/eula=false/eula=true/' "$eula_path"
 server_properties="server.properties"
 sed -i'' -e 's/^difficulty=.*/difficulty=peaceful/' "$server_properties"
 sed -i'' -e "s/^level-seed=.*/level-seed=$NEW_SEED/" "$server_properties"
+sed -i'' -e "s/^online-mode=.*/online-mode=false/" "$server_properties"
 
 # Run server again
 java -Xmx2G -jar fabric-server-mc.1.19.2-loader.0.15.11-launcher.1.0.1.jar nogui

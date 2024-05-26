@@ -21,13 +21,13 @@ This project seeks to expand the research to include how multi-agents form group
 
 ### Download and Run Fabric Minecraft Server Launcher on local
 ```sh
-chmod 751 scritps/*run*.sh
+chmod 751 scripts/*run*.sh
 
 # If a server isn't installed 
-scritps/download_run_server.sh
+scripts/download_run_server.sh
 
 # IF a server is already install 
-scritps/run_server.sh
+scripts/run_server.sh
 ```
 ### Set world
 - seed: 637184628307790
