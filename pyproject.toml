@@ -6,7 +6,7 @@ authors = ["naem1023 <relilau00@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "<3.13,>=3.9"
 tqdm = "^4.66.4"
 langchain = "^0.2.0"
 javascript = "^1!1.2.0"
@@ -22,6 +22,7 @@ minecraft-launcher-lib = "^6.5"
 langchain-community = "^0.2.1"
 langchain-openai = "^0.1.7"
 python-dotenv = "^1.0.1"
+langchain-chroma = "^0.1.1"
 
 
 [tool.poetry.group.dev.dependencies]

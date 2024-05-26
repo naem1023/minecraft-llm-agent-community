@@ -5,7 +5,8 @@ This project aims to observe how agents in the Minecraft world autonomously form
 This project seeks to expand the research to include how multi-agents form groups, in addition to autonomously learning skills and exploring items, similar to [Voyager](https://github.com/MineDojo/Voyager).
 
 ## TODO 
-- [ ] Basic Environment Setup using Voyager baseline
+- [x] Basic Environment Setup using Voyager baseline
+- [ ] Analysis Voyager baseline and make a detail architecture image and pseudo code
 - [ ] Setup local llm via vllm or text-generation-inference
 - [ ] Make single agent using Voyager baseline
 - [ ] Make simple multi agent 
@@ -14,7 +15,6 @@ This project seeks to expand the research to include how multi-agents form group
 ### Dependenceis
 - Pyhton: v3.9
 - Node: v18
-- (Optional) Minecraft client launcher: v1.19.2
 
 ### Prepare JDK 21>=
 - For example, donwload the installation file from [https://www.oracle.com/java/technologies/downloads/#jdk22-mac](https://www.oracle.com/java/technologies/downloads/#jdk22-mac).
@@ -37,7 +37,7 @@ Set the x y z position on the server command
 /setworldspawn 63 94 168
 ```
 
-server.properties
+server.properties: These settings will automatically set via download_run_server.sh.
 ```txt
 difficulty=peaceful
 gamemode=survival
@@ -47,6 +47,8 @@ rcon.password=hunter2
 rcon.port=25575
 spawn-protection=0 # This is important, otherwise the bot can't do anything near the spawn
 ```
+### Prepare minecraft mods for client
+- Check the [fabric mods installation document](installation/fabric_mods_install.md)
 ### Make python environment
 ```sh
 conda create -n mw python=3.9 -y
@@ -68,9 +70,12 @@ cd ..
 npm install
 ```
 
+### Set environment variables
+Make `.env` file and set environment variables like `.env.sample`.
+
 # Test
 ```sh
-
+python learn_voyager.py
 ```
 
 # Contribution

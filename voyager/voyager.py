@@ -3,8 +3,11 @@ import os
 import time
 from typing import Dict
 
-from voyager.agents import ActionAgent, CriticAgent, CurriculumAgent, SkillManager
-from voyager.env import VoyagerEnv
+from voyager.agents.action import ActionAgent
+from voyager.agents.critic import CriticAgent
+from voyager.agents.curriculum import CurriculumAgent
+from voyager.agents.skill import SkillManager
+from voyager.env.bridge import VoyagerEnv
 from voyager.utils.json_utils import json_dumps
 from voyager.utils.record_utils import EventRecorder
 
@@ -204,6 +207,8 @@ class Voyager:
     def step(self):
         if self.action_agent_rollout_num_iter < 0:
             raise ValueError("Agent must be reset before stepping")
+
+        # Generate the javascript code to execute
         ai_message = self.action_agent.llm(self.messages)
         print(f"\033[34m****Action Agent ai message****\n{ai_message.content}\033[0m")
         self.conversations.append(

@@ -3,10 +3,11 @@ from __future__ import annotations
 import random
 import re
 
-from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.schema import HumanMessage, SystemMessage
-from langchain.vectorstores import Chroma
+from langchain_chroma import Chroma
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.system import SystemMessage
+from langchain_openai import ChatOpenAI
+from langchain_openai.embeddings import OpenAIEmbeddings
 
 from voyager.prompts import load_prompt
 from voyager.utils.file_utils import f_mkdir
@@ -58,7 +59,7 @@ class CurriculumAgent:
         # vectordb for qa cache
         self.qa_cache_questions_vectordb = Chroma(
             collection_name="qa_cache_questions_vectordb",
-            embedding_function=OpenAIEmbeddings(),
+            embedding_function=OpenAIEmbeddings(model="text-embedding-3-small"),
             persist_directory=f"{ckpt_dir}/curriculum/vectordb",
         )
         assert self.qa_cache_questions_vectordb._collection.count() == len(
@@ -239,6 +240,18 @@ class CurriculumAgent:
         return HumanMessage(content=content)
 
     def propose_next_task(self, *, events, chest_observation, max_retries=5):
+        """
+        Propose next task like "Mine 1 wood log".
+
+        3 path to propose the next task:
+        - progress==0: start to mine 1 wood
+        - auto: use curriculum agent to propose the next task
+        - manual: manually input the task and context by humna via terminal interface
+
+        Return:
+            - task: str, the task to be done
+            - context: str, the context of the task
+        """
         if self.progress == 0 and self.mode == "auto":
             task = "Mine 1 wood log"
             context = "You can mine one of oak, birch, spruce, jungle, acacia, dark oak, or mangrove logs."
