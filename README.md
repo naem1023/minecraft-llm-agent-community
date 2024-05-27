@@ -17,7 +17,7 @@ The purpose of this project can be changed, and welcome diverse opinions and fee
 ## TODO 
 - [x] Basic Environment Setup using Voyager baseline
 - [x] Make single agent using Voyager baseline
-- [ ] Analysis Voyager baseline and make a detail architecture image and pseudo code
+- [x] Analysis Voyager baseline and make a detail architecture image and pseudo code
 - [ ] Setup local llm via vllm or text-generation-inference
 - [ ] Make simple multi agent 
 
