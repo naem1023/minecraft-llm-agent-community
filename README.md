@@ -1,6 +1,6 @@
 # ⛏️ minecraft-llm-agent-community
 
-**[🤖 Documentation Blog](https://naem1023.github.io/minecraft-llm-agent-community/)**
+[🤖 Documentation Blog](https://naem1023.github.io/minecraft-llm-agent-community/)
 
 ---
 
