@@ -2,7 +2,8 @@
 sidebar_position: 1
 ---
 
-# ⛏️ minecraft-llm-agent-community
+# Introduction
+About ⛏️ minecraft-llm-agent-community.
 
 This project aims to observe how agents in the Minecraft world autonomously form groups and create villages. It is still in its early stages, and if valuable insights can be derived, it will be used as a research topic.
 
