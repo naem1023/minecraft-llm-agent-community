@@ -244,6 +244,14 @@ class Voyager:
 
             if self.reset_placed_if_failed and not success:
                 # revert all the placing event in the last step
+                """
+                At the building task, we may want to revert all the placing event in the last step.
+                self.reset_placed_if_failed: a flag to control this behavior.
+
+                So, a feature of this code block is
+                - If the task is failed, we will revert all the placing event in the last step.
+                - else, skip.
+                """
                 blocks = []
                 positions = []
                 for event_type, event in events:
@@ -252,6 +260,8 @@ class Voyager:
                         position = event["status"]["position"]
                         blocks.append(block)
                         positions.append(position)
+
+                # Run javascript code directly for reverting the placed blocks.
                 new_events = self.env.step(
                     f"await givePlacedItemBack(bot, {json_dumps(blocks)}, {json_dumps(positions)})",
                     programs=self.skill_manager.programs,
@@ -259,12 +269,17 @@ class Voyager:
                 events[-1][1]["inventory"] = new_events[-1][1]["inventory"]
                 events[-1][1]["voxels"] = new_events[-1][1]["voxels"]
 
-            # Retrieve the skill from db. 
+            # Retrieve the skill from db.
             new_skills = self.skill_manager.retrieve_skills(
                 query=self.context
                 + "\n\n"
                 + self.action_agent.summarize_chatlog(events)
             )
+            """
+            Make messages to generate javascript code for the next iteration.
+            - system message: the message with new skills which is relevant to the current context.
+            - human message: the message with the current events, code, task, context, and critique.
+            """
             system_message = self.action_agent.render_system_message(skills=new_skills)
             human_message = self.action_agent.render_human_message(
                 events=events,
@@ -276,6 +291,10 @@ class Voyager:
             self.last_events = copy.deepcopy(events)
             self.messages = [system_message, human_message]
         else:
+            """
+            If the AI message is not a dict, it means javascript code execution is failed.
+            So try again.
+            """
             assert isinstance(parsed_result, str)
             self.recorder.record([], self.task)
             print(f"\033[34m{parsed_result} Trying again!\033[0m")
