@@ -113,7 +113,7 @@ class SkillManager:
         skill_description = f"    // { self.llm(messages).content}"
         return f"async function {program_name}(bot) {{\n{skill_description}\n}}"
 
-    def retrieve_skills(self, query):
+    def retrieve_skills(self, query: str) -> list[str]:
         k = min(self.vectordb._collection.count(), self.retrieval_top_k)
         if k == 0:
             return []

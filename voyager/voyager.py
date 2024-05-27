@@ -214,16 +214,26 @@ class Voyager:
         self.conversations.append(
             (self.messages[0].content, self.messages[1].content, ai_message.content)
         )
+
+        # Parse the AI message and extract the program code to execute immediately
         parsed_result = self.action_agent.process_ai_message(message=ai_message)
         success = False
         if isinstance(parsed_result, dict):
             code = parsed_result["program_code"] + "\n" + parsed_result["exec_code"]
+
+            # Take a step. The code is executed in the Minecraft environment
             events = self.env.step(
                 code,
                 programs=self.skill_manager.programs,
             )
+
+            # Record the events to the event recorder
             self.recorder.record(events, self.task)
+
+            # Update the chest(inventory) memory of the action agent
             self.action_agent.update_chest_memory(events[-1][1]["nearbyChests"])
+
+            # Check if the task is successful via the critic agent
             success, critique = self.critic_agent.check_task_success(
                 events=events,
                 task=self.task,
@@ -234,6 +244,14 @@ class Voyager:
 
             if self.reset_placed_if_failed and not success:
                 # revert all the placing event in the last step
+                """
+                At the building task, we may want to revert all the placing event in the last step.
+                self.reset_placed_if_failed: a flag to control this behavior.
+
+                So, a feature of this code block is
+                - If the task is failed, we will revert all the placing event in the last step.
+                - else, skip.
+                """
                 blocks = []
                 positions = []
                 for event_type, event in events:
@@ -242,17 +260,26 @@ class Voyager:
                         position = event["status"]["position"]
                         blocks.append(block)
                         positions.append(position)
+
+                # Run javascript code directly for reverting the placed blocks.
                 new_events = self.env.step(
                     f"await givePlacedItemBack(bot, {json_dumps(blocks)}, {json_dumps(positions)})",
                     programs=self.skill_manager.programs,
                 )
                 events[-1][1]["inventory"] = new_events[-1][1]["inventory"]
                 events[-1][1]["voxels"] = new_events[-1][1]["voxels"]
+
+            # Retrieve the skill from db.
             new_skills = self.skill_manager.retrieve_skills(
                 query=self.context
                 + "\n\n"
                 + self.action_agent.summarize_chatlog(events)
             )
+            """
+            Make messages to generate javascript code for the next iteration.
+            - system message: the message with new skills which is relevant to the current context.
+            - human message: the message with the current events, code, task, context, and critique.
+            """
             system_message = self.action_agent.render_system_message(skills=new_skills)
             human_message = self.action_agent.render_human_message(
                 events=events,
@@ -264,6 +291,10 @@ class Voyager:
             self.last_events = copy.deepcopy(events)
             self.messages = [system_message, human_message]
         else:
+            """
+            If the AI message is not a dict, it means javascript code execution is failed.
+            So try again.
+            """
             assert isinstance(parsed_result, str)
             self.recorder.record([], self.task)
             print(f"\033[34m{parsed_result} Trying again!\033[0m")
@@ -322,6 +353,10 @@ class Voyager:
             if self.recorder.iteration > self.max_iterations:
                 print("Iteration limit reached")
                 break
+            """
+            Propose next task by the curriculum agent.
+            It can suggest using LLM or heuristic rules.
+            """
             task, context = self.curriculum_agent.propose_next_task(
                 events=self.last_events,
                 chest_observation=self.action_agent.render_chest_observation(),
