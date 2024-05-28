@@ -1,6 +1,9 @@
 # ⛏️ minecraft-llm-agent-community
 
-[🤖 Documentation Blog](https://naem1023.github.io/minecraft-llm-agent-community/)
+- [🤖 Documentation Blog](https://naem1023.github.io/minecraft-llm-agent-community/)
+  - [Installation Guide](https://naem1023.github.io/minecraft-llm-agent-community/docs/Installation)
+- [📚 Analysis of Prior Projects](https://naem1023.github.io/minecraft-llm-agent-community/docs/Analysis-of-Prior-Projects)
+  - [Simple Analysis of Voyager](https://naem1023.github.io/minecraft-llm-agent-community/docs/Analysis-of-Prior-Projects/voyager)
 
 ---
 
