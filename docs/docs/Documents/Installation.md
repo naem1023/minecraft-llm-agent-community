@@ -40,7 +40,7 @@ rcon.port=25575
 spawn-protection=0 # This is important, otherwise the bot can't do anything near the spawn
 ```
 ### Prepare minecraft mods for client
-- Check the [fabric mods installation document](installation/fabric_mods_install.md)
+- Check the [fabric mods installation document](Fabric-mod-installation.md)
 ### Make python environment
 ```sh
 conda create -n mw python=3.9 -y
