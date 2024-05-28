@@ -21,5 +21,3 @@ In this tutorial, we will install the Fabric launcher and 5 mods. Remember to us
       min_respawn_distance=0
       ```
 5. Don't forget to change the `version` in `azure_login` to `fabric-loader-0.14.18-1.19` that you are using. You can find it under `YOUR_MINECRAFT_GAME_LOCATION/version` folder.
-
-You can return to [README.md](../README.md#getting-started) and getting started now.
