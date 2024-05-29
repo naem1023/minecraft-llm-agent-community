@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # Installation
@@ -12,7 +12,7 @@ sidebar_position: 1
 - For example, donwload the installation file from [https://www.oracle.com/java/technologies/downloads/#jdk22-mac](https://www.oracle.com/java/technologies/downloads/#jdk22-mac).
 
 ### Download and Run Fabric Minecraft Server Launcher on local
-```sh
+```shell
 chmod 751 scripts/*run*.sh
 
 # If a server isn't installed 
@@ -42,14 +42,14 @@ spawn-protection=0 # This is important, otherwise the bot can't do anything near
 ### Prepare minecraft mods for client
 - Check the [fabric mods installation document](Fabric-mod-installation.md)
 ### Make python environment
-```sh
+```shell
 conda create -n mw python=3.9 -y
 conda activate mw
 make install
 ```
 
 ### Install mineflayer and additional minecraft interface library
-```sh
+```shell
 npm install mineflayer
 
 cd voyager/env/mineflayer
