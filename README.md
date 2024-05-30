@@ -27,6 +27,9 @@ The purpose of this project can be changed, and welcome diverse opinions and fee
 - [ ] Setup local llm via vllm or text-generation-inference
 - [ ] Setup monitoring system for multi-agent
 
+## Architecture
+It's a sample architecture of executing a bot. It's not a final architecture.
+![](docs/docs/Documents/img/sample-architecture.png)
 ## Installation Guides
 Check the [Installation Document](https://naem1023.github.io/minecraft-llm-agent-community/docs/Documents/Installation)
 
