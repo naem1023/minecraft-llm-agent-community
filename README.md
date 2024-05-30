@@ -1,11 +1,10 @@
 # ⛏️ minecraft-llm-agent-community
 
 - [🤖 Documentation Blog](https://naem1023.github.io/minecraft-llm-agent-community/)
+  - [Architecture](https://naem1023.github.io/minecraft-llm-agent-community/docs/Architecture-of-Project)
   - [Installation Guide](https://naem1023.github.io/minecraft-llm-agent-community/docs/Installation)
 - [📚 Analysis of Prior Projects](https://naem1023.github.io/minecraft-llm-agent-community/docs/Analysis-of-Prior-Projects)
   - [Simple Analysis of Voyager](https://naem1023.github.io/minecraft-llm-agent-community/docs/Analysis-of-Prior-Projects/voyager)
-
----
 
 This project aims to observe how agents in the Minecraft world autonomously form groups and create villages. It is still in its early stages, and if valuable insights can be derived, it will be used as a research topic.
 
@@ -22,70 +21,17 @@ The purpose of this project can be changed, and welcome diverse opinions and fee
 - [x] Basic Environment Setup using Voyager baseline
 - [x] Make single agent using Voyager baseline
 - [x] Analysis Voyager baseline and make a detail architecture image and pseudo code
-- [ ] Setup local llm via vllm or text-generation-inference
+- [ ] Setup an architecture for multi-agent based on Voyager
 - [ ] Make simple multi agent 
+- [ ] Improve agent can learn and explore interactive skiils like fighting, talking, and so on.
+- [ ] Setup local llm via vllm or text-generation-inference
+- [ ] Setup monitoring system for multi-agent
 
+## Architecture
+It's a sample architecture of executing a bot. It's not a final architecture.
+![](docs/docs/Documents/img/sample-architecture.png)
 ## Installation Guides
-### Dependenceis
-- Pyhton: v3.9
-- Node: v18
-
-### Prepare JDK 21>=
-- For example, donwload the installation file from [https://www.oracle.com/java/technologies/downloads/#jdk22-mac](https://www.oracle.com/java/technologies/downloads/#jdk22-mac).
-
-### Download and Run Fabric Minecraft Server Launcher on local
-```sh
-chmod 751 scripts/*run*.sh
-
-# If a server isn't installed 
-scripts/download_run_server.sh
-
-# IF a server is already install 
-scripts/run_server.sh
-```
-### Set world
-- seed: 637184628307790
-- coordinate: 63 94 168
-Set the x y z position on the server command
-```
-/setworldspawn 63 94 168
-```
-
-server.properties: These settings will automatically set via download_run_server.sh.
-```txt
-difficulty=peaceful
-gamemode=survival
-online-mode=false
-enable-rcon=true # Only needed if you wish to use RCON features
-rcon.password=hunter2
-rcon.port=25575
-spawn-protection=0 # This is important, otherwise the bot can't do anything near the spawn
-```
-### Prepare minecraft mods for client
-- Check the [fabric mods installation document](installation/fabric_mods_install.md)
-### Make python environment
-```sh
-conda create -n mw python=3.9 -y
-conda activate mw
-make install
-```
-
-### Install mineflayer and additional minecraft interface library
-```sh
-npm install mineflayer
-
-cd voyager/env/mineflayer
-npm install -g npx
-npm install
-cd mineflayer-collectblock
-npm install
-npx tsc
-cd ..
-npm install
-```
-
-### Set environment variables
-Make `.env` file and set environment variables like `.env.sample`.
+Check the [Installation Document](https://naem1023.github.io/minecraft-llm-agent-community/docs/Documents/Installation)
 
 # Test
 ```sh
