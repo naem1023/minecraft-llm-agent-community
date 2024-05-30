@@ -22,8 +22,10 @@ The purpose of this project can be changed, and welcome diverse opinions and fee
 - [x] Make single agent using Voyager baseline
 - [x] Analysis Voyager baseline and make a detail architecture image and pseudo code
 - [ ] Setup an architecture for multi-agent based on Voyager
-- [ ] Setup local llm via vllm or text-generation-inference
 - [ ] Make simple multi agent 
+- [ ] Improve agent can learn and explore interactive skiils like fighting, talking, and so on.
+- [ ] Setup local llm via vllm or text-generation-inference
+- [ ] Setup monitoring system for multi-agent
 
 ## Installation Guides
 Check the [Installation Document](https://naem1023.github.io/minecraft-llm-agent-community/docs/Documents/Installation)
