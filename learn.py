@@ -2,11 +2,12 @@ import os
 
 from dotenv import load_dotenv
 
-from voyager.voyager import Voyager
+from minecraft_agent_community.voyager import Voyager
+from logzero import logger
 
 load_dotenv()
 
-print(os.system("node -v"))
+logger.info(f"node version: {os.system('node -v')}")
 
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 model = "gpt-3.5-turbo"

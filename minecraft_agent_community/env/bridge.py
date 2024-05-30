@@ -8,7 +8,7 @@ import gymnasium as gym
 import requests
 from gymnasium.core import ObsType
 
-from voyager.utils.file_utils import f_join, f_mkdir
+from minecraft_agent_community.utils.file_utils import f_join, f_mkdir
 
 from .minecraft_launcher import MinecraftInstance
 from .process_monitor import SubprocessMonitor

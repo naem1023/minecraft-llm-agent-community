@@ -35,7 +35,7 @@ Check the [Installation Document](https://naem1023.github.io/minecraft-llm-agent
 
 # Test
 ```sh
-python learn_voyager.py
+python learn.py
 ```
 
 # Contribution

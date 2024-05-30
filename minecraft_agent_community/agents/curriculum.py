@@ -9,9 +9,9 @@ from langchain_core.messages.system import SystemMessage
 from langchain_openai import ChatOpenAI
 from langchain_openai.embeddings import OpenAIEmbeddings
 
-from voyager.prompts import load_prompt
-from voyager.utils.file_utils import f_mkdir
-from voyager.utils.json_utils import dump_json, fix_and_parse_json, load_json
+from minecraft_agent_community.prompts import load_prompt
+from minecraft_agent_community.utils.file_utils import f_mkdir
+from minecraft_agent_community.utils.json_utils import dump_json, fix_and_parse_json, load_json
 
 
 class CurriculumAgent:

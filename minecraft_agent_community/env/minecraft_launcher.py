@@ -4,8 +4,8 @@ import sys
 
 import minecraft_launcher_lib
 
-from voyager.utils.file_utils import f_exists, f_join, f_mkdir
-from voyager.utils.json_utils import json_dump, json_load
+from minecraft_agent_community.utils.file_utils import f_exists, f_join, f_mkdir
+from minecraft_agent_community.utils.json_utils import json_dump, json_load
 
 from .process_monitor import SubprocessMonitor
 

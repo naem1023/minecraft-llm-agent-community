@@ -2,11 +2,11 @@ import os
 
 import pkg_resources
 
-from voyager.utils.file_utils import load_text
+from minecraft_agent_community.utils.file_utils import load_text
 
 
 def load_control_primitives(primitive_names=None):
-    package_path = pkg_resources.resource_filename("voyager", "")
+    package_path = pkg_resources.resource_filename("minecraft_agent_community", "")
     if primitive_names is None:
         primitive_names = [
             primitives[:-3]

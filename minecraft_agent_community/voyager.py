@@ -3,13 +3,13 @@ import os
 import time
 from typing import Dict
 
-from voyager.agents.action import ActionAgent
-from voyager.agents.critic import CriticAgent
-from voyager.agents.curriculum import CurriculumAgent
-from voyager.agents.skill import SkillManager
-from voyager.env.bridge import VoyagerEnv
-from voyager.utils.json_utils import json_dumps
-from voyager.utils.record_utils import EventRecorder
+from minecraft_agent_community.agents.action import ActionAgent
+from minecraft_agent_community.agents.critic import CriticAgent
+from minecraft_agent_community.agents.curriculum import CurriculumAgent
+from minecraft_agent_community.agents.skill import SkillManager
+from minecraft_agent_community.env.bridge import VoyagerEnv
+from minecraft_agent_community.utils.json_utils import json_dumps
+from minecraft_agent_community.utils.record_utils import EventRecorder
 
 
 # TODO: remove event memory

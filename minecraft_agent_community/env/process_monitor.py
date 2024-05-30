@@ -8,7 +8,7 @@ from typing import List
 
 import psutil
 
-from voyager.utils.file_utils import f_join
+from minecraft_agent_community.utils.file_utils import f_join
 
 
 class SubprocessMonitor:

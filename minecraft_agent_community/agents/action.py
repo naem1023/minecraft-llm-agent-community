@@ -8,10 +8,10 @@ from langchain_core.messages.system import SystemMessage
 from langchain_core.prompts.chat import SystemMessagePromptTemplate
 from langchain_openai import ChatOpenAI
 
-from voyager.control_primitives_context import load_control_primitives_context
-from voyager.prompts import load_prompt
-from voyager.utils.file_utils import f_mkdir
-from voyager.utils.json_utils import dump_json, load_json
+from minecraft_agent_community.control_primitives_context import load_control_primitives_context
+from minecraft_agent_community.prompts import load_prompt
+from minecraft_agent_community.utils.file_utils import f_mkdir
+from minecraft_agent_community.utils.json_utils import dump_json, load_json
 
 
 class ActionAgent:
