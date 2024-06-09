@@ -1,5 +1,9 @@
 # ⛏️ minecraft-llm-agent-community
 
+<div style="color: red; border: 2px solid red; padding: 10px; font-weight: bold;">
+  This project will be resumed after June 18th, 2024, worldwide.
+</div>
+
 - [🤖 Documentation Blog](https://naem1023.github.io/minecraft-llm-agent-community/)
   - [Architecture](https://naem1023.github.io/minecraft-llm-agent-community/docs/Architecture-of-Project)
   - [Installation Guide](https://naem1023.github.io/minecraft-llm-agent-community/docs/Installation)
