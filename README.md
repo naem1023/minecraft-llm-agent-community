@@ -1,5 +1,7 @@
 # ⛏️ minecraft-llm-agent-community
 
+**This project will be resumed after June 18th, 2024, worldwide.**
+
 - [🤖 Documentation Blog](https://naem1023.github.io/minecraft-llm-agent-community/)
   - [Architecture](https://naem1023.github.io/minecraft-llm-agent-community/docs/Architecture-of-Project)
   - [Installation Guide](https://naem1023.github.io/minecraft-llm-agent-community/docs/Installation)
