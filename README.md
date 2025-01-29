@@ -35,10 +35,6 @@ It's a sample architecture of executing a bot. It's not a final architecture.
 ## Installation Guides
 Check the [Installation Document](https://naem1023.github.io/minecraft-llm-agent-community/docs/Documents/Installation)
 
-# Test
-```sh
-python learn_voyager.py
-```
 
 # Contribution
 ## Check lint
