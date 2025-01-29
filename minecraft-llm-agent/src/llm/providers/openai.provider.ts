@@ -16,7 +16,7 @@ export class OpenAIProvider implements LLMProvider {
       timeout: 30000, // 30초 타임아웃
       maxRetries: 3,  // 최대 3번 재시도
     });
-    this.model = config.model || 'gpt-4';
+    this.model = config.model || 'gpt-4o-mini';
   }
 
   async generateText(prompt: string): Promise<LLMResponse> {

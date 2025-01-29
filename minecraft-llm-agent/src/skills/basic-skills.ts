@@ -7,7 +7,7 @@ export class BasicSkills {
   static async moveToPosition(bot: Bot, position: Vec3): Promise<void> {
     const { pathfinder } = bot;
     const mcData = require('minecraft-data')(bot.version);
-    const movements = new Movements(bot, mcData);
+    const movements = new Movements(bot);
     
     pathfinder.setMovements(movements);
     const goal = new goals.GoalBlock(position.x, position.y, position.z);

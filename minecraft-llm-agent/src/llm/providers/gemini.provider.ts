@@ -12,11 +12,11 @@ export class GeminiProvider implements LLMProvider {
 
     this.client = new GoogleGenerativeAI(config.geminiApiKey);
     this.model = this.client.getGenerativeModel({ 
-      model: config.model || 'gemini-1.5-pro',
+      model: config.model || 'gemini-1.5-flash',
       // Gemini 모델 설정
       generationConfig: {
         temperature: 0.7,
-        topK: 40,
+        topK: 1,
         topP: 0.95,
         maxOutputTokens: 1024,
       },
@@ -28,25 +28,6 @@ export class GeminiProvider implements LLMProvider {
       // 채팅 세션 시작
       const chat = this.model.startChat({
         history: [],
-        // 안전 설정
-        safetySettings: [
-          {
-            category: 'HARM_CATEGORY_HARASSMENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-          },
-          {
-            category: 'HARM_CATEGORY_HATE_SPEECH',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-          },
-          {
-            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-          },
-          {
-            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-          },
-        ],
       });
 
       const result = await chat.sendMessage(prompt);
