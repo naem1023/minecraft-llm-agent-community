@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union
 import re
 import time
 
@@ -17,14 +18,14 @@ from voyager.utils.json_utils import dump_json, load_json
 class ActionAgent:
     def __init__(
         self,
-        model_name="gpt-3.5-turbo",
-        temperature=0,
-        request_timout=120,
-        ckpt_dir="ckpt",
-        resume=False,
-        chat_log=True,
-        execution_error=True,
-    ):
+        model_name: str = "gpt-3.5-turbo",
+        temperature: float = 0,
+        request_timout: int = 120,
+        ckpt_dir: str = "ckpt",
+        resume: bool = False,
+        chat_log: bool = True,
+        execution_error: bool = True,
+    ) -> None:
         self.ckpt_dir = ckpt_dir
         self.chat_log = chat_log
         self.execution_error = execution_error
@@ -33,14 +34,14 @@ class ActionAgent:
             print(f"\033[32mLoading Action Agent from {ckpt_dir}/action\033[0m")
             self.chest_memory = load_json(f"{ckpt_dir}/action/chest_memory.json")
         else:
-            self.chest_memory = {}
+            self.chest_memory: Dict[str, Union[Dict, str]] = {}
         self.llm = ChatOpenAI(
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
         )
 
-    def update_chest_memory(self, chests):
+    def update_chest_memory(self, chests: Dict[str, Union[Dict, str]]) -> None:
         for position, chest in chests.items():
             if position in self.chest_memory:
                 if isinstance(chest, dict):
@@ -58,8 +59,8 @@ class ActionAgent:
                     self.chest_memory[position] = chest
         dump_json(self.chest_memory, f"{self.ckpt_dir}/action/chest_memory.json")
 
-    def render_chest_observation(self):
-        chests = []
+    def render_chest_observation(self) -> str:
+        chests: List[str] = []
         for chest_position, chest in self.chest_memory.items():
             if isinstance(chest, dict) and len(chest) > 0:
                 chests.append(f"{chest_position}: {chest}")
@@ -72,15 +73,15 @@ class ActionAgent:
                 chests.append(f"{chest_position}: Unknown items inside")
         assert len(chests) == len(self.chest_memory)
         if chests:
-            chests = "\n".join(chests)
-            return f"Chests:\n{chests}\n\n"
+            chests_str = "\n".join(chests)
+            return f"Chests:\n{chests_str}\n\n"
         else:
             return "Chests: None\n\n"
 
-    def render_system_message(self, skills=[]):
+    def render_system_message(self, skills: List[str] = []) -> SystemMessage:
         system_template = load_prompt("action_template")
         # FIXME: Hardcoded control_primitives
-        base_skills = [
+        base_skills: List[str] = [
             "exploreUntil",
             "mineBlock",
             "craftItem",
@@ -105,12 +106,17 @@ class ActionAgent:
         return system_message
 
     def render_human_message(
-        self, *, events, code="", task="", context="", critique=""
-    ):
-        chat_messages = []
-        error_messages = []
-        # FIXME: damage_messages is not used
-        damage_messages = []
+        self, 
+        *,
+        events: List[Tuple[str, Dict[str, Any]]],
+        code: str = "",
+        task: str = "",
+        context: str = "",
+        critique: str = ""
+    ) -> HumanMessage:
+        chat_messages: List[str] = []
+        error_messages: List[str] = []
+        damage_messages: List[str] = []
         assert events[-1][0] == "observe", "Last event must be observe"
         for i, (event_type, event) in enumerate(events):
             if event_type == "onChat":
@@ -203,7 +209,7 @@ class ActionAgent:
 
         return HumanMessage(content=observation)
 
-    def process_ai_message(self, message):
+    def process_ai_message(self, message: AIMessage) -> Union[Dict[str, str], str]:
         assert isinstance(message, AIMessage)
 
         retry = 3
@@ -216,7 +222,7 @@ class ActionAgent:
                 code_pattern = re.compile(r"```(?:javascript|js)(.*?)```", re.DOTALL)
                 code = "\n".join(code_pattern.findall(message.content))
                 parsed = babel.parse(code)
-                functions = []
+                functions: List[Dict[str, Any]] = []
                 assert len(list(parsed.program.body)) > 0, "No functions found"
                 for i, node in enumerate(parsed.program.body):
                     if node.type != "FunctionDeclaration":
@@ -260,8 +266,8 @@ class ActionAgent:
                 time.sleep(1)
         return f"Error parsing action response (before program execution): {error}"
 
-    def summarize_chatlog(self, events):
-        def filter_item(message: str):
+    def summarize_chatlog(self, events: List[Tuple[str, Dict[str, Any]]]) -> str:
+        def filter_item(message: str) -> str:
             craft_pattern = r"I cannot make \w+ because I need: (.*)"
             craft_pattern2 = (
                 r"I cannot make \w+ because there is no crafting table nearby"
@@ -276,7 +282,7 @@ class ActionAgent:
             else:
                 return ""
 
-        chatlog = set()
+        chatlog: set[str] = set()
         for event_type, event in events:
             if event_type == "onChat":
                 item = filter_item(event["onChat"])
