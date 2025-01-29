@@ -67,14 +67,23 @@ async function collectAll(
                             );
                             // @ts-ignore
                         } else if (err.name === "NoItem") {
-                            const properties =
-                                bot.registry.blocksByName[closest.name];
-                            const leastTool = Object.keys(
-                                properties.harvestTools
-                            )[0];
-                            const item = bot.registry.items[leastTool];
+                            const blockType = bot.registry.blocksByName[closest.name as keyof typeof bot.registry.blocksByName];
+                            if (!blockType || !blockType.harvestTools) {
+                                bot.chat(`Cannot determine required tool for ${closest.name}! Skip it!`);
+                                return;
+                            }
+                            
+                            const leastTool = Object.keys(blockType.harvestTools)[0];
+                            const toolId = parseInt(leastTool);
+                            const item = bot.registry.items[toolId];
+                            
+                            if (!item) {
+                                bot.chat(`Cannot determine tool info for ${closest.name}! Skip it!`);
+                                return;
+                            }
+                            
                             bot.chat(
-                                `I need at least a ${item.name} to mine ${closest.name}!  Skip it!`
+                                `I need at least a ${item.name} to mine ${closest.name}! Skip it!`
                             );
                             return;
                         } else if (
