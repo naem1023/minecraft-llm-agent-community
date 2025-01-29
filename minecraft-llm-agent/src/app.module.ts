@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MinecraftModule } from './minecraft/minecraft.module';
 import { SkillsModule } from './skills/skills.module';
 import { GoalsModule } from './goals/goals.module';
@@ -7,6 +8,9 @@ import { PoliciesModule } from './policies/policies.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     MinecraftModule,
     SkillsModule,
     GoalsModule,
