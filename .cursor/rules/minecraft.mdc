@@ -1,0 +1,22 @@
+---
+description: minecraft llm agent
+globs: 
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+- 프로젝트 목적: LLM을 활용해 마인크래프트의 봇이 특정 목표를 위해 자유롭게 탐험/행동하여 목표를 수행하는 프레임워크 개발
+- 개발 언어: javascript(가능하면 typescript)
+- 설계:  
+  1. LLM을 활용해 automatic curriculm이라는 목표를 사전에 세워야 함. 이미 세워져있다면 목표에 달성되었는지 확인 필요. 
+  2. automatic curriculm을 순차적으로 수행하기 위해 필요한 skill이 있는지 확인. 이 skill들은 javascript 코드로 정의된 코드 뭉치.
+  3. skill이 있다면 즉시 활용, 없다면 LLM을 활용해 일련의 javascript 함수를 작성해 skill 생성 후 실행.
+  4. 1, 2, 3번 작업을 계속해서 반복. 
+
+- 구현 방법:
+  - 다양한 구현체 도입이 가능하도록 유연한 프레임워크 구조로 구성되어야 함.
+  - mineflayer 라이브러리를 중점적으로 사용하여 마인크래프트 봇을 조작할 수 있어야 함.
+  - 마인크래프트 서버의 봇을 조작하는 것이므로 이를 염두하여 javascript 백엔드 서버가 띄워져야 함. 
