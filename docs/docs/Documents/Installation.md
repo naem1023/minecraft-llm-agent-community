@@ -9,17 +9,21 @@ sidebar_position: 3
 - Node: v18
 
 ### Prepare JDK 21>=
-- For example, donwload the installation file from [https://www.oracle.com/java/technologies/downloads/#jdk22-mac](https://www.oracle.com/java/technologies/downloads/#jdk22-mac).
+mac
+```sh
+brew install cask
+brew install --cask temurin@21
+```
 
 ### Download and Run Fabric Minecraft Server Launcher on local
 ```shell
-chmod 751 scripts/*run*.sh
+chmod 751 scripts/*.sh
 
 # If a server isn't installed 
-scripts/download_run_server.sh
+bash scripts/download_and_run.sh
 
 # IF a server is already install 
-scripts/run_server.sh
+bash scripts/run.sh
 ```
 ### Set world
 - seed: 637184628307790

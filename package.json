@@ -1,0 +1,20 @@
+{
+  "name": "minecraft-llm-agent",
+  "version": "0.1.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@langchain/community": "^0.3.27",
+    "@langchain/core": "^0.3.36",
+    "@langchain/openai": "^0.4.2",
+    "chromadb": "^1.10.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.21.2",
+    "langchain": "^0.3.14",
+    "mineflayer": "^4.25.0",
+    "openai": "^4.0.0"
+  }
+}
