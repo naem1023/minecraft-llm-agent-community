@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
 import re
 import time
+from typing import Any, Dict, List, Tuple, Union
 
 from javascript import require
 from langchain_core.messages.ai import AIMessage
@@ -74,7 +74,7 @@ class ActionAgent:
         assert len(chests) == len(self.chest_memory)
         if chests:
             chests_str = "\n".join(chests)
-            return f"Chests:\n{chests_str}\n\n"
+            return f"Chests: \n{chests_str}\n\n"
         else:
             return "Chests: None\n\n"
 
@@ -106,13 +106,13 @@ class ActionAgent:
         return system_message
 
     def render_human_message(
-        self, 
+        self,
         *,
         events: List[Tuple[str, Dict[str, Any]]],
         code: str = "",
         task: str = "",
         context: str = "",
-        critique: str = ""
+        critique: str = "",
     ) -> HumanMessage:
         chat_messages: List[str] = []
         error_messages: List[str] = []
@@ -141,14 +141,14 @@ class ActionAgent:
         observation = ""
 
         if code:
-            observation += f"Code from the last round:\n{code}\n\n"
+            observation += f"Code from the last round: \n{code}\n\n"
         else:
             observation += "Code from the last round: No code in the first round\n\n"
 
         if self.execution_error:
             if error_messages:
                 error = "\n".join(error_messages)
-                observation += f"Execution error:\n{error}\n\n"
+                observation += f"Execution error: \n{error}\n\n"
             else:
                 observation += "Execution error: No error\n\n"
 
