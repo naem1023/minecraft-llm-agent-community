@@ -7,6 +7,7 @@ sidebar_position: 2
 - [x] Basic Environment Setup using Voyager baseline
 - [x] Make single agent using Voyager baseline
 - [x] Analysis Voyager baseline and make a detail architecture image and pseudo code
+- [x] Fix Voyager bug for replication
 - [ ] Setup an architecture for multi-agent based on Voyager
 - [ ] Make simple multi agent 
 - [ ] Improve agent can learn and explore interactive skiils like fighting, talking, and so on.

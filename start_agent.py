@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 from voyager.voyager import Voyager
 
+
 load_dotenv()
 
 print(os.system("node -v"))

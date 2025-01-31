@@ -1,7 +1,7 @@
 [project]
 name = "minecraft-llm-agent-community"
 version = "0.1.0"
-description = "Add your description here"
+description = "Minecraft LLM Agent Community"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -20,4 +20,40 @@ dependencies = [
     "tiktoken>=0.8.0",
     "tqdm>=4.67.1",
     "setuptools>=75.8.0",
+    "logzero>=1.7.0",
+    "langsmith>=0.3.2",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.9.4",
+]
+
+[tool.ruff]
+exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+# Never enforce `E501` (line length violations).
+ignore = ["C901", "E501", "E402"]
+select = ["C", "E", "F", "I", "W"]
+
+# Ignore import violations in all `__init__.py` files.
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402", "F401", "F403", "F811"]
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+

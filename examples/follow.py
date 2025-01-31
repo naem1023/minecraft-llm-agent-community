@@ -1,5 +1,6 @@
 from javascript import On, require
 
+
 mineflayer = require("mineflayer")
 pathfinder = require("mineflayer-pathfinder").pathfinder
 Movements = require("mineflayer-pathfinder").Movements
