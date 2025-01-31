@@ -1,7 +1,8 @@
+import re
 import time
 
-from .file_utils import *
-from .json_utils import *
+from .file_utils import f_join, f_listdir, f_mkdir
+from .json_utils import dump_json, load_json
 
 
 class EventRecorder:
@@ -24,12 +25,24 @@ class EventRecorder:
         if resume:
             self.resume()
 
-    def record(self, events, task):
+    @staticmethod
+    def is_valid_event(event: list) -> bool:
+        if (
+            isinstance(event, list)
+            and len(event) > 0
+            and all(len(e) > 0 for e in event)
+        ):
+            return True
+        return False
+
+    def record(self, events: list, task: str):
         task = re.sub(r'[\\/:"*?<>| ]', "_", task)
         task = task.replace(" ", "_") + time.strftime(
             "_%Y%m%d_%H%M%S", time.localtime()
         )
         self.iteration += 1
+        if not self.is_valid_event(events):
+            return
         if not self.init_position:
             self.init_position = [
                 events[0][1]["status"]["position"]["x"],

@@ -7,9 +7,9 @@ from langchain_core.messages.ai import AIMessage
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.system import SystemMessage
 from langchain_core.prompts.chat import SystemMessagePromptTemplate
-from langchain_openai import ChatOpenAI
 
 from voyager.control_primitives_context import load_control_primitives_context
+from voyager.llm import LLM
 from voyager.prompts import load_prompt
 from voyager.utils.file_utils import f_mkdir
 from voyager.utils.json_utils import dump_json, load_json
@@ -18,7 +18,7 @@ from voyager.utils.json_utils import dump_json, load_json
 class ActionAgent:
     def __init__(
         self,
-        model_name: str = "gpt-3.5-turbo",
+        model_name: str = "gpt-4o-mini",
         temperature: float = 0,
         request_timout: int = 120,
         ckpt_dir: str = "ckpt",
@@ -35,7 +35,7 @@ class ActionAgent:
             self.chest_memory = load_json(f"{ckpt_dir}/action/chest_memory.json")
         else:
             self.chest_memory: Dict[str, Union[Dict, str]] = {}
-        self.llm = ChatOpenAI(
+        self.llm = LLM(
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
@@ -89,12 +89,14 @@ class ActionAgent:
             "smeltItem",
             "killMob",
         ]
-        if not self.llm.model_name == "gpt-3.5-turbo":
+        if not self.llm.model_name == "gpt-4o-mini":
             base_skills += [
                 "useChest",
                 "mineflayer",
             ]
-        programs = "\n\n".join(load_control_primitives_context(base_skills) + skills)
+        programs: str = "\n\n".join(
+            load_control_primitives_context(base_skills) + skills
+        )
         response_format = load_prompt("action_response_format")
         system_message_prompt = SystemMessagePromptTemplate.from_template(
             system_template
@@ -246,13 +248,15 @@ class ActionAgent:
                     if function["type"] == "AsyncFunctionDeclaration":
                         main_function = function
                         break
-                assert (
-                    main_function is not None
-                ), "No async function found. Your main function must be async."
+                assert main_function is not None, (
+                    "No async function found. Your main function must be async."
+                )
                 assert (
                     len(main_function["params"]) == 1
                     and main_function["params"][0].name == "bot"
-                ), f"Main function {main_function['name']} must take a single argument named 'bot'"
+                ), (
+                    f"Main function {main_function['name']} must take a single argument named 'bot'"
+                )
                 program_code = "\n\n".join(function["body"] for function in functions)
                 exec_code = f"await {main_function['name']}(bot);"
                 return {

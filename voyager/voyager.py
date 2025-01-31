@@ -1,7 +1,10 @@
 import copy
 import os
 import time
+import traceback
 from typing import Dict
+
+from logzero import logger
 
 from voyager.agents.action import ActionAgent
 from voyager.agents.critic import CriticAgent
@@ -25,23 +28,23 @@ class Voyager:
         env_request_timeout: int = 600,
         max_iterations: int = 160,
         reset_placed_if_failed: bool = False,
-        action_agent_model_name: str = "gpt-3.5-turbo",
+        action_agent_model_name: str = "gpt-4o-mini",
         action_agent_temperature: float = 0,
         action_agent_task_max_retries: int = 4,
         action_agent_show_chat_log: bool = True,
         action_agent_show_execution_error: bool = True,
-        curriculum_agent_model_name: str = "gpt-3.5-turbo",
+        curriculum_agent_model_name: str = "gpt-4o-mini",
         curriculum_agent_temperature: float = 0,
-        curriculum_agent_qa_model_name: str = "gpt-3.5-turbo",
+        curriculum_agent_qa_model_name: str = "gpt-4o-mini",
         curriculum_agent_qa_temperature: float = 0,
         curriculum_agent_warm_up: Dict[str, int] = None,
         curriculum_agent_core_inventory_items: str = r".*_log|.*_planks|stick|crafting_table|furnace"
         r"|cobblestone|dirt|coal|.*_pickaxe|.*_sword|.*_axe",
         curriculum_agent_mode: str = "auto",
-        critic_agent_model_name: str = "gpt-3.5-turbo",
+        critic_agent_model_name: str = "gpt-4o-mini",
         critic_agent_temperature: float = 0,
         critic_agent_mode: str = "auto",
-        skill_manager_model_name: str = "gpt-3.5-turbo",
+        skill_manager_model_name: str = "gpt-4o-mini",
         skill_manager_temperature: float = 0,
         skill_manager_retrieval_top_k: int = 5,
         openai_api_request_timeout: int = 240,
@@ -209,7 +212,7 @@ class Voyager:
             raise ValueError("Agent must be reset before stepping")
 
         # Generate the javascript code to execute
-        ai_message = self.action_agent.llm(self.messages)
+        ai_message = self.action_agent.llm.generate(self.messages)
         print(f"\033[34m****Action Agent ai message****\n{ai_message.content}\033[0m")
         self.conversations.append(
             (self.messages[0].content, self.messages[1].content, ai_message.content)
@@ -221,11 +224,13 @@ class Voyager:
         if isinstance(parsed_result, dict):
             code = parsed_result["program_code"] + "\n" + parsed_result["exec_code"]
 
+            logger.debug(f"Executing code: {code}")
             # Take a step. The code is executed in the Minecraft environment
             events = self.env.step(
                 code,
                 programs=self.skill_manager.programs,
             )
+            logger.debug(f"Events: {events}")
 
             # Record the events to the event recorder
             self.recorder.record(events, self.task)
@@ -389,6 +394,7 @@ class Voyager:
                 )
                 # use red color background to print the error
                 print("Your last round rollout terminated due to error:")
+                logger.error(f"Error: {traceback.format_exc()}")
                 print(f"\033[41m{e}\033[0m")
 
             if info["success"]:

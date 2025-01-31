@@ -1,6 +1,7 @@
 """
 File system utils.
 """
+
 # import pwd
 import codecs
 import collections
@@ -17,6 +18,7 @@ import tarfile
 import tempfile
 from datetime import datetime
 from socket import gethostname
+
 
 f_ext = os.path.splitext
 
@@ -340,14 +342,12 @@ def _include_patterns(*patterns):
     """
 
     def _ignore_patterns(path, names):
-        keep = set(
-            name for pattern in patterns for name in fnmatch.filter(names, pattern)
-        )
-        ignore = set(
+        keep = {name for pattern in patterns for name in fnmatch.filter(names, pattern)}
+        ignore = {
             name
             for name in names
             if name not in keep and not os.path.isdir(os.path.join(path, name))
-        )
+        }
         return ignore
 
     return _ignore_patterns
@@ -355,9 +355,9 @@ def _include_patterns(*patterns):
 
 def f_copytree(fsrc, fdst, symlinks=False, ignore=None, include=None, exist_ok=True):
     fsrc, fdst = f_expand(fsrc), f_expand(fdst)
-    assert (ignore is None) or (
-        include is None
-    ), "ignore= and include= are mutually exclusive"
+    assert (ignore is None) or (include is None), (
+        "ignore= and include= are mutually exclusive"
+    )
     if ignore:
         ignore = shutil.ignore_patterns(*ignore)
     elif include:

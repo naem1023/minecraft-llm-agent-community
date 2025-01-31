@@ -1,10 +1,8 @@
 # ⛏️ minecraft-llm-agent-community
 
-**This project will be resumed after June 18th, 2024, worldwide.**
-
 - [🤖 Documentation Blog](https://naem1023.github.io/minecraft-llm-agent-community/)
-  - [Architecture](https://naem1023.github.io/minecraft-llm-agent-community/docs/Architecture-of-Project)
-  - [Installation Guide](https://naem1023.github.io/minecraft-llm-agent-community/docs/Installation)
+  - [Architecture](https://naem1023.github.io/minecraft-llm-agent-community/docs/Documents/Architecture-of-Project)
+  - [Installation Guide](https://naem1023.github.io/minecraft-llm-agent-community/docs/Documents/Installation)
 - [📚 Analysis of Prior Projects](https://naem1023.github.io/minecraft-llm-agent-community/docs/Analysis-of-Prior-Projects)
   - [Simple Analysis of Voyager](https://naem1023.github.io/minecraft-llm-agent-community/docs/Analysis-of-Prior-Projects/voyager)
 
@@ -23,6 +21,7 @@ The purpose of this project can be changed, and welcome diverse opinions and fee
 - [x] Basic Environment Setup using Voyager baseline
 - [x] Make single agent using Voyager baseline
 - [x] Analysis Voyager baseline and make a detail architecture image and pseudo code
+- [x] Fix bugs, deprecated methods and modules for Voyager replication
 - [ ] Setup an architecture for multi-agent based on Voyager
 - [ ] Make simple multi agent 
 - [ ] Improve agent can learn and explore interactive skiils like fighting, talking, and so on.
@@ -35,15 +34,19 @@ It's a sample architecture of executing a bot. It's not a final architecture.
 ## Installation Guides
 Check the [Installation Document](https://naem1023.github.io/minecraft-llm-agent-community/docs/Documents/Installation)
 
-# Test
+# Run
 ```sh
-python learn_voyager.py
+python start_agent.py
 ```
+
+## Check the bots are running
+If you want to check the bots, install minecraft and conenct to the local minecraft server.
+The default address is `localhost:25565`.
 
 # Contribution
 ## Check lint
 ```sh
-make pre-commit
+make lint
 ```
 
 # Citation

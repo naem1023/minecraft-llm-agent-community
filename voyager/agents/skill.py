@@ -3,10 +3,9 @@ import os
 from langchain_chroma import Chroma
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.system import SystemMessage
-from langchain_openai import ChatOpenAI
-from langchain_openai.embeddings import OpenAIEmbeddings
 
 from voyager.control_primitives import load_control_primitives
+from voyager.llm import LLM, EmbeddingModel
 from voyager.prompts import load_prompt
 from voyager.utils.file_utils import dump_text, f_mkdir
 from voyager.utils.json_utils import dump_json, load_json
@@ -15,14 +14,14 @@ from voyager.utils.json_utils import dump_json, load_json
 class SkillManager:
     def __init__(
         self,
-        model_name="gpt-3.5-turbo",
+        model_name="gpt-4o-mini",
         temperature=0,
         retrieval_top_k=5,
         request_timout=120,
         ckpt_dir="ckpt",
         resume=False,
     ):
-        self.llm = ChatOpenAI(
+        self.llm = LLM(
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
@@ -41,7 +40,7 @@ class SkillManager:
         self.ckpt_dir = ckpt_dir
         self.vectordb = Chroma(
             collection_name="skill_vectordb",
-            embedding_function=OpenAIEmbeddings(model="text-embedding-3-small"),
+            embedding_function=EmbeddingModel(model_name="text-embedding-3-small"),
             persist_directory=f"{ckpt_dir}/skill/vectordb",
         )
         assert self.vectordb._collection.count() == len(self.skills), (
@@ -88,9 +87,9 @@ class SkillManager:
             "code": program_code,
             "description": skill_description,
         }
-        assert self.vectordb._collection.count() == len(
-            self.skills
-        ), "vectordb is not synced with skills.json"
+        assert self.vectordb._collection.count() == len(self.skills), (
+            "vectordb is not synced with skills.json"
+        )
         dump_text(program_code, f"{self.ckpt_dir}/skill/code/{dumped_program_name}.js")
         dump_text(
             skill_description,
@@ -110,7 +109,7 @@ class SkillManager:
                 + f"The main function is `{program_name}`."
             ),
         ]
-        skill_description = f"    // { self.llm(messages).content}"
+        skill_description = f"    // {self.llm.generate(messages).content}"
         return f"async function {program_name}(bot) {{\n{skill_description}\n}}"
 
     def retrieve_skills(self, query: str) -> list[str]:
