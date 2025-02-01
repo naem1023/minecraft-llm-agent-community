@@ -4,8 +4,7 @@ SHELL = bash
 
 .ONESHELL:
 install:
-	pip install poetry
-	poetry install --with dev --no-root
+	uv sync --no-install-project --inexact
 
 
 .ONESHELL:
@@ -16,8 +15,3 @@ pre-commit-install:
 lint:
 	uv run --only-group dev ruff check --fix .
 	uv run --only-group dev ruff format .
-
-.ONESHELL:
-pre-commit:
-	# pre-commit
-	git ls-files | xargs pre-commit run -c .conf/.pre-commit-config.yaml --verbose --file
