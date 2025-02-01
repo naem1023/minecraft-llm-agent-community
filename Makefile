@@ -1,7 +1,5 @@
 SHELL = bash
 
-.PHONY: install pre-commit
-
 .ONESHELL:
 install:
 	uv sync --no-install-project --inexact

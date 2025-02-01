@@ -39,8 +39,6 @@ rcon.password=hunter2
 rcon.port=25575
 spawn-protection=0 # This is important, otherwise the bot can't do anything near the spawn
 ```
-### Prepare minecraft mods for client
-- Check the [fabric mods installation document](Fabric-mod-installation.md)
 ### Make python environment
 ```shell
 # install uv

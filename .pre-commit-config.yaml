@@ -1,9 +1,9 @@
 repos:
 -   repo: local
     hooks:
-    - id: style
-      name: style
+    - id: lint
+      name: lint
       language: system
-      entry: make style
+      entry: make lint
       types: [python]
       require_serial: true
