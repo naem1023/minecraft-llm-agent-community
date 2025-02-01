@@ -39,12 +39,12 @@ rcon.password=hunter2
 rcon.port=25575
 spawn-protection=0 # This is important, otherwise the bot can't do anything near the spawn
 ```
-### Prepare minecraft mods for client
-- Check the [fabric mods installation document](Fabric-mod-installation.md)
 ### Make python environment
 ```shell
-conda create -n mw python=3.9 -y
-conda activate mw
+# install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# install dependencies
 make install
 ```
 
@@ -64,3 +64,9 @@ npm install
 
 ### Set environment variables
 Make `.env` file and set environment variables like `.env.sample`.
+
+#### Set bot as op
+If it's not op, the server will kick the bot because of the chat.
+```shell
+/op bot
+```
