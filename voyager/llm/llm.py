@@ -5,7 +5,7 @@ from langchain_core.messages import AIMessage, BaseMessage
 from langchain_openai import ChatOpenAI
 from logzero import logger
 
-from voyager.core.env import env
+from voyager.core.env import env_var
 from voyager.llm.mock import mock_responses
 
 
@@ -13,7 +13,7 @@ class LLM:
     def __init__(self, *, model_name: str, **kwargs):
         self.model_name = model_name
 
-        if env.is_test:
+        if env_var.is_test:
             logger.info("Using mock LLM instead of real LLM")
             self.llm: FakeListLLM = FakeListLLM(responses=mock_responses)
         else:

@@ -13,4 +13,4 @@ class Env(BaseSettings):
     is_test: bool = False
 
 
-env: BaseSettings = Env()
+env_var: BaseSettings = Env()
