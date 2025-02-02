@@ -11,12 +11,15 @@ from voyager.agents.critic import CriticAgent
 from voyager.agents.curriculum import CurriculumAgent
 from voyager.agents.skill import SkillManager
 from voyager.env.bridge import VoyagerEnv
+from voyager.env.name import get_random_name
 from voyager.utils.json_utils import json_dumps
 from voyager.utils.record_utils import EventRecorder
-from voyager.env.name import get_random_name
 
 
-# TODO: remove event memory
+def is_valid_name(name: str | None) -> bool:
+    return name is not None and name.isalpha() and len(name) > 0
+
+
 class Voyager:
     def __init__(
         self,
@@ -52,7 +55,7 @@ class Voyager:
         ckpt_dir: str = "ckpt",
         skill_library_dir: str = None,
         resume: bool = False,
-        name: str = None,
+        name: str | None = None,
     ):
         """
         The main class for Voyager.
@@ -108,7 +111,7 @@ class Voyager:
         """
         # init env
         self.env = VoyagerEnv(
-            name=name if name else get_random_name(),
+            name=name if is_valid_name(name) else get_random_name(),
             mc_port=mc_port,
             azure_login=azure_login,
             server_port=server_port,
@@ -118,18 +121,14 @@ class Voyager:
         self.reset_placed_if_failed = reset_placed_if_failed
         self.max_iterations = max_iterations
 
-        # set openai api key
-        os.environ["OPENAI_API_KEY"] = openai_api_key
-
-        # set openai base url
-        os.environ["OPENAI_API_BASE"] = openai_api_base
+        self.ckpt_dir: str = os.path.join(ckpt_dir, name)
 
         # init agents
         self.action_agent = ActionAgent(
             model_name=action_agent_model_name,
             temperature=action_agent_temperature,
             request_timout=openai_api_request_timeout,
-            ckpt_dir=ckpt_dir,
+            ckpt_dir=self.ckpt_dir,
             resume=resume,
             chat_log=action_agent_show_chat_log,
             execution_error=action_agent_show_execution_error,
@@ -141,7 +140,7 @@ class Voyager:
             qa_model_name=curriculum_agent_qa_model_name,
             qa_temperature=curriculum_agent_qa_temperature,
             request_timout=openai_api_request_timeout,
-            ckpt_dir=ckpt_dir,
+            ckpt_dir=self.ckpt_dir,
             resume=resume,
             mode=curriculum_agent_mode,
             warm_up=curriculum_agent_warm_up,
@@ -158,10 +157,10 @@ class Voyager:
             temperature=skill_manager_temperature,
             retrieval_top_k=skill_manager_retrieval_top_k,
             request_timout=openai_api_request_timeout,
-            ckpt_dir=skill_library_dir if skill_library_dir else ckpt_dir,
+            ckpt_dir=self.ckpt_dir,
             resume=True if resume or skill_library_dir else False,
         )
-        self.recorder = EventRecorder(ckpt_dir=ckpt_dir, resume=resume)
+        self.recorder = EventRecorder(ckpt_dir=self.ckpt_dir, resume=resume)
         self.resume = resume
 
         # init variables for rollout

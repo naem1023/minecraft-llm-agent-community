@@ -112,6 +112,7 @@ class VoyagerEnv(gym.Env):
         data = {
             "code": code,
             "programs": programs,
+            "bot_name": self.name,
         }
         res = requests.post(
             f"{self.server}/step", json=data, timeout=self.request_timeout
@@ -163,7 +164,7 @@ class VoyagerEnv(gym.Env):
     def close(self):
         self.unpause()
         if self.connected:
-            res = requests.post(f"{self.server}/stop")
+            res = requests.post(f"{self.server}/stop", json={"bot_name": self.name})
             if res.status_code == 200:
                 self.connected = False
         if self.mc_instance:
@@ -173,7 +174,7 @@ class VoyagerEnv(gym.Env):
 
     def pause(self):
         if self.mineflayer.is_running and not self.server_paused:
-            res = requests.post(f"{self.server}/pause")
+            res = requests.post(f"{self.server}/pause", json={"bot_name": self.name})
             if res.status_code == 200:
                 self.server_paused = True
         return self.server_paused

@@ -15,7 +15,8 @@ const OnSave = require("./lib/observation/onSave");
 const Chests = require("./lib/observation/chests");
 const { plugin: tool } = require("mineflayer-tool");
 
-let bot = null;
+// Replace single bot variable with a map of bots
+const bots = new Map();
 
 const app = express();
 
@@ -23,17 +24,23 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: false }));
 
 app.post("/start", (req, res) => {
-    if (bot) onDisconnect("Restarting bot");
-    bot = null;
+    const botId = req.body.bot_name;
+
+    if (bots.has(botId)) {
+        onDisconnect(botId, "Restarting bot");
+    }
+
     console.log(req.body);
-    bot = mineflayer.createBot({
-        host: "localhost", // minecraft server ip
-        port: req.body.port, // minecraft server port
-        username: req.body.bot_name,
+    const bot = mineflayer.createBot({
+        host: "localhost",
+        port: req.body.port,
+        username: botId,
         disableChatSigning: true,
         checkTimeoutInterval: 60 * 60 * 1000,
     });
-    bot.once("error", onConnectionFailed);
+
+    bots.set(botId, bot);
+    bot.once("error", (err) => onConnectionFailed(botId, err, res));
 
     // Event subscriptions
     bot.waitTicks = req.body.waitTicks;
@@ -42,7 +49,7 @@ app.post("/start", (req, res) => {
     bot.stuckPosList = [];
     bot.iron_pickaxe = false;
 
-    bot.on("kicked", onDisconnect);
+    bot.on("kicked", () => onDisconnect(botId, "Bot was kicked"));
 
     // mounting will cause physicsTick to stop
     bot.on("mount", () => {
@@ -50,7 +57,7 @@ app.post("/start", (req, res) => {
     });
 
     bot.once("spawn", async () => {
-        bot.removeListener("error", onConnectionFailed);
+        bot.removeListener("error", (err) => onConnectionFailed(botId, err, res));
         let itemTicks = 1;
         if (req.body.reset === "hard") {
             bot.chat("/clear @s");
@@ -142,22 +149,32 @@ app.post("/start", (req, res) => {
         bot.chat("/gamerule doDaylightCycle false");
     });
 
-    function onConnectionFailed(e) {
+    function onConnectionFailed(botId, e, res) {
         console.log(e);
-        bot = null;
+        bots.delete(botId);
         res.status(400).json({ error: e });
     }
-    function onDisconnect(message) {
-        if (bot.viewer) {
-            bot.viewer.close();
+    function onDisconnect(botId, message) {
+        const bot = bots.get(botId);
+        if (bot) {
+            if (bot.viewer) {
+                bot.viewer.close();
+            }
+            bot.end();
+            console.log(`Bot ${botId}: ${message}`);
+            bots.delete(botId);
         }
-        bot.end();
-        console.log(message);
-        bot = null;
     }
 });
 
 app.post("/step", async (req, res) => {
+    const botId = req.body.bot_name;
+    const bot = bots.get(botId);
+
+    if (!bot) {
+        return res.status(404).json({ error: "Bot not found" });
+    }
+
     // import useful package
     let response_sent = false;
     function otherError(err) {
@@ -407,17 +424,28 @@ app.post("/step", async (req, res) => {
 });
 
 app.post("/stop", (req, res) => {
-    bot.end();
+    const botId = req.body.bot_name;
+    const bot = bots.get(botId);
+
+    if (bot) {
+        bot.end();
+        bots.delete(botId);
+    }
+
     res.json({
-        message: "Bot stopped",
+        message: `Bot ${botId} stopped`,
     });
 });
 
 app.post("/pause", (req, res) => {
+    const botId = req.body.bot_name;
+    const bot = bots.get(botId);
+
     if (!bot) {
-        res.status(400).json({ error: "Bot not spawned" });
+        res.status(400).json({ error: "Bot not found" });
         return;
     }
+
     bot.chat("/pause");
     bot.waitForTicks(bot.waitTicks).then(() => {
         res.json({ message: "Success" });

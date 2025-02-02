@@ -1,5 +1,6 @@
 import random
 
+
 sample_names = [
     "Alice",
     "Bob",
@@ -16,4 +17,3 @@ sample_names = [
 
 def get_random_name() -> str:
     return random.choice(sample_names)
-
