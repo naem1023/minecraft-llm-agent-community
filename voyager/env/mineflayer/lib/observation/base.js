@@ -2,7 +2,7 @@ class Observation {
     constructor(bot) {
         if (new.target === Observation) {
             throw new TypeError(
-                "Cannot instantiate abstract class Observation"
+                "Cannot instantiate abstract class Observation",
             );
         }
 

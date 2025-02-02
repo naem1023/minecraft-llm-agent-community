@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mineflayer = require("mineflayer");
 const { logInfo, logError } = require("./lib/logger");
-const domain = require('domain');
+const domain = require("domain");
 
 const skills = require("./lib/skillLoader");
 const { initCounter, getNextTime } = require("./lib/utils");
@@ -88,7 +88,9 @@ app.post("/start", (req, res) => {
     bot.once("spawn", async () => {
         try {
             logInfo(`Starting initialization for bot ${botId}`);
-            bot.removeListener("error", (err) => onConnectionFailed(botId, err, res));
+            bot.removeListener("error", (err) =>
+                onConnectionFailed(botId, err, res),
+            );
             let itemTicks = 1;
 
             // 먼저 플러그인들을 로드
@@ -136,7 +138,7 @@ app.post("/start", (req, res) => {
                     if (i === 4) continue;
                     if (equipment[i]) {
                         bot.chat(
-                            `/item replace entity @s ${equipmentNames[i]} with minecraft:${equipment[i]}`
+                            `/item replace entity @s ${equipmentNames[i]} with minecraft:${equipment[i]}`,
                         );
                         await bot.waitForTicks(bot.waitTicks);
                     }
@@ -144,7 +146,11 @@ app.post("/start", (req, res) => {
             }
 
             // iron_pickaxe 체크
-            if (bot.inventory.items().find((item) => item.name === "iron_pickaxe")) {
+            if (
+                bot.inventory
+                    .items()
+                    .find((item) => item.name === "iron_pickaxe")
+            ) {
                 bot.iron_pickaxe = true;
             }
 
@@ -166,7 +172,6 @@ app.post("/start", (req, res) => {
 
             logInfo(`Bot ${botId} initialization completed successfully`);
             res.json(bot.observe());
-
         } catch (err) {
             logError(`Error during bot ${botId} initialization:`, err);
             onDisconnect(botId, "Initialization error");
@@ -184,11 +189,11 @@ app.post("/start", (req, res) => {
         if (bot) {
             logInfo(`Disconnecting bot ${botId}: ${message}`);
             // 모든 이벤트 리스너 제거
-            bot.removeAllListeners('kicked');
-            bot.removeAllListeners('mount');
-            bot.removeAllListeners('physicsTick');
-            bot.removeAllListeners('chatEvent');
-            bot.removeAllListeners('error');
+            bot.removeAllListeners("kicked");
+            bot.removeAllListeners("mount");
+            bot.removeAllListeners("physicsTick");
+            bot.removeAllListeners("chatEvent");
+            bot.removeAllListeners("error");
 
             if (bot.viewer) {
                 bot.viewer.close();
@@ -236,14 +241,18 @@ app.post("/step", async (req, res) => {
 
     try {
         mcData = require("minecraft-data")(bot.version);
-        mcData.itemsByName["leather_cap"] = mcData.itemsByName["leather_helmet"];
+        mcData.itemsByName["leather_cap"] =
+            mcData.itemsByName["leather_helmet"];
         mcData.itemsByName["leather_tunic"] =
             mcData.itemsByName["leather_chestplate"];
         mcData.itemsByName["leather_pants"] =
             mcData.itemsByName["leather_leggings"];
-        mcData.itemsByName["leather_boots"] = mcData.itemsByName["leather_boots"];
-        mcData.itemsByName["lapis_lazuli_ore"] = mcData.itemsByName["lapis_ore"];
-        mcData.blocksByName["lapis_lazuli_ore"] = mcData.blocksByName["lapis_ore"];
+        mcData.itemsByName["leather_boots"] =
+            mcData.itemsByName["leather_boots"];
+        mcData.itemsByName["lapis_lazuli_ore"] =
+            mcData.itemsByName["lapis_ore"];
+        mcData.blocksByName["lapis_lazuli_ore"] =
+            mcData.blocksByName["lapis_ore"];
 
         const {
             Movements,
@@ -303,8 +312,8 @@ app.post("/step", async (req, res) => {
         let _smeltItemFailCount = 0;
 
         // Retrieve array form post body
-        const code = req.body.code || '';
-        const programs = req.body.programs || '';
+        const code = req.body.code || "";
+        const programs = req.body.programs || "";
         bot.cumulativeObs = [];
 
         await bot.waitForTicks(bot.waitTicks);
@@ -336,7 +345,7 @@ app.post("/step", async (req, res) => {
         });
         if (crafting_table) {
             bot.chat(
-                `/setblock ${crafting_table.position.x} ${crafting_table.position.y} ${crafting_table.position.z} air destroy`
+                `/setblock ${crafting_table.position.x} ${crafting_table.position.y} ${crafting_table.position.z} air destroy`,
             );
             bot.chat("/give @s crafting_table");
         }
@@ -346,7 +355,7 @@ app.post("/step", async (req, res) => {
         });
         if (furnace) {
             bot.chat(
-                `/setblock ${furnace.position.x} ${furnace.position.y} ${furnace.position.z} air destroy`
+                `/setblock ${furnace.position.x} ${furnace.position.y} ${furnace.position.z} air destroy`,
             );
             bot.chat("/give @s furnace");
         }
@@ -448,25 +457,27 @@ app.post("/pause", (req, res) => {
 const DEFAULT_PORT = 3000;
 const PORT = process.argv[2] || DEFAULT_PORT;
 
-const server = app.listen(PORT)
-    .on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            logError(`Port ${PORT} is already in use. Please use a different port.`);
+const server = app
+    .listen(PORT)
+    .on("error", (err) => {
+        if (err.code === "EADDRINUSE") {
+            logError(
+                `Port ${PORT} is already in use. Please use a different port.`,
+            );
             process.exit(1);
         } else {
-            logError('Server error:', err);
+            logError("Server error:", err);
             process.exit(1);
         }
     })
-    .on('listening', () => {
+    .on("listening", () => {
         logInfo(`Server started on port ${PORT}`);
     });
 
 // 프로세스 종료 시 서버 정리
-process.on('SIGTERM', () => {
+process.on("SIGTERM", () => {
     server.close(() => {
-        logInfo('Server terminated');
+        logInfo("Server terminated");
         process.exit(0);
     });
 });
-

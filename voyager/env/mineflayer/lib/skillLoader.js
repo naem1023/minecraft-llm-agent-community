@@ -21,10 +21,10 @@ function inject(bot) {
                         bot.activateItem();
                         reject(
                             new Error(
-                                "Finishing timeout, make sure you get to and look at a water block!"
-                            )
+                                "Finishing timeout, make sure you get to and look at a water block!",
+                            ),
                         );
-                    }, 60000))
+                    }, 60000)),
             ),
         ]);
         clearTimeout(timeout);

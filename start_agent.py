@@ -1,11 +1,14 @@
 import asyncio
-from voyager.voyager import Voyager
-from voyager.core.env import env_var
 
 from logzero import logger
 
+from voyager.core.env import env_var
+from voyager.voyager import Voyager
+
+
 model: str = "gpt-4o-mini"
 names: list[str] = ["Alice", "Bob"]
+
 
 async def run_voyager(name: str):
     voyager = Voyager(
@@ -22,16 +25,18 @@ async def run_voyager(name: str):
         logger.error(f"Learning job is cancelled for {name}")
         raise
 
+
 async def main():
     tasks = [asyncio.create_task(run_voyager(name)) for name in names]
     try:
         await asyncio.gather(*tasks)
-    except Exception as e:
+    except Exception:
         logger.error("Error occurred:", exc_info=True)
     finally:
         for task in tasks:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
+
 
 if __name__ == "__main__":
     try:

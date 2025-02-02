@@ -11,6 +11,7 @@
 </p>
 
 ---
+
 ## This is a modified version to better support Voyager
 
 ## Showcase
@@ -20,13 +21,14 @@ The source code of the bot in the video can be seen in the examples folder, [her
 
 ### Description
 
-This plugin is a wrapper for mineflayer that allows for easier API usage when collecting blocks or item drops. This plugin is designed to reduce some of the boilerplate code based around the act of pathfinding to a block _(handled by_ ***mineflayer-pathfinder***_)_, selecting the best tool to mine that block _(handled by_ ***mineflayer-tool***_)_, actually mining it, then moving to collect the item drops from that block. This plugin allows for all of that basic concept to be wrapped up into a single API function.
+This plugin is a wrapper for mineflayer that allows for easier API usage when collecting blocks or item drops. This plugin is designed to reduce some of the boilerplate code based around the act of pathfinding to a block _(handled by_ **_mineflayer-pathfinder_**_)_, selecting the best tool to mine that block _(handled by_ **_mineflayer-tool_**_)_, actually mining it, then moving to collect the item drops from that block. This plugin allows for all of that basic concept to be wrapped up into a single API function.
 
-In addition to the usage above, some additional quality of life features are available in this plugin. These include the ability to automatically deposit items into a chest when the bot's inventory is full, collecting new tools from a chest if the bot doesn't currently have a required tool _(also handled by_ ***mineflayer-tool***_)_, and allowing for queueing of multiple blocks or item drops to the collection task, so they can be processed later.
+In addition to the usage above, some additional quality of life features are available in this plugin. These include the ability to automatically deposit items into a chest when the bot's inventory is full, collecting new tools from a chest if the bot doesn't currently have a required tool _(also handled by_ **_mineflayer-tool_**_)_, and allowing for queueing of multiple blocks or item drops to the collection task, so they can be processed later.
 
 ### Getting Started
 
 This plugin is built using Node and can be installed using:
+
 ```bash
 npm install --save mineflayer-collectblock
 ```
@@ -37,39 +39,39 @@ The brief description goes here.
 
 ```js
 // Create your bot
-const mineflayer = require("mineflayer")
+const mineflayer = require("mineflayer");
 const bot = mineflayer.createBot({
-  host: 'localhost',
-  username: 'Player',
-})
-let mcData
+    host: "localhost",
+    username: "Player",
+});
+let mcData;
 
 // Load collect block
-bot.loadPlugin(require('mineflayer-collectblock').plugin)
+bot.loadPlugin(require("mineflayer-collectblock").plugin);
 
 async function collectGrass() {
-  // Find a nearby grass block
-  const grass = bot.findBlock({
-    matching: mcData.blocksByName.grass_block.id,
-    maxDistance: 64
-  })
+    // Find a nearby grass block
+    const grass = bot.findBlock({
+        matching: mcData.blocksByName.grass_block.id,
+        maxDistance: 64,
+    });
 
-  if (grass) {
-    // If we found one, collect it.
-    try {
-      await bot.collectBlock.collect(grass)
-      collectGrass() // Collect another grass block
-    } catch (err) {
-      console.log(err) // Handle errors, if any
+    if (grass) {
+        // If we found one, collect it.
+        try {
+            await bot.collectBlock.collect(grass);
+            collectGrass(); // Collect another grass block
+        } catch (err) {
+            console.log(err); // Handle errors, if any
+        }
     }
-  }
 }
 
 // On spawn, start collecting all nearby grass
-bot.once('spawn', () => {
-  mcData = require('minecraft-data')(bot.version)
-  collectGrass()
-})
+bot.once("spawn", () => {
+    mcData = require("minecraft-data")(bot.version);
+    collectGrass();
+});
 ```
 
 ### Documentation

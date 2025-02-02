@@ -84,14 +84,14 @@ class Status extends Observation {
             if (entity.position.distanceTo(this.bot.entity.position) < 32) {
                 if (!mobs[entity.name]) {
                     mobs[entity.name] = entity.position.distanceTo(
-                        this.bot.entity.position
+                        this.bot.entity.position,
                     );
                 } else if (
                     mobs[entity.name] >
                     entity.position.distanceTo(this.bot.entity.position)
                 ) {
                     mobs[entity.name] = entity.position.distanceTo(
-                        this.bot.entity.position
+                        this.bot.entity.position,
                     );
                 }
             }

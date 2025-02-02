@@ -4,56 +4,56 @@
  * area.
  */
 
-const mineflayer = require('mineflayer')
-const collectBlock = require('mineflayer-collectblock').plugin
+const mineflayer = require("mineflayer");
+const collectBlock = require("mineflayer-collectblock").plugin;
 
 if (process.argv.length < 4 || process.argv.length > 6) {
-  console.log('Usage : node oreMiner.js <host> <port> [<name>] [<password>]')
-  process.exit(1)
+    console.log("Usage : node oreMiner.js <host> <port> [<name>] [<password>]");
+    process.exit(1);
 }
 
 const bot = mineflayer.createBot({
-  host: process.argv[2],
-  port: process.argv[3],
-  username: process.argv[4] || 'oreMiner',
-  password: process.argv[5]
-})
+    host: process.argv[2],
+    port: process.argv[3],
+    username: process.argv[4] || "oreMiner",
+    password: process.argv[5],
+});
 
-bot.loadPlugin(collectBlock)
+bot.loadPlugin(collectBlock);
 
-let mcData
-bot.once('spawn', () => {
-  mcData = require('minecraft-data')(bot.version)
-})
+let mcData;
+bot.once("spawn", () => {
+    mcData = require("minecraft-data")(bot.version);
+});
 
-bot.on('chat', async (username, message) => {
-  const args = message.split(' ')
-  if (args[0] !== 'collect') return
+bot.on("chat", async (username, message) => {
+    const args = message.split(" ");
+    if (args[0] !== "collect") return;
 
-  const blockType = mcData.blocksByName[args[1]]
-  if (!blockType) {
-    bot.chat(`I don't know any blocks named ${args[1]}.`)
-    return
-  }
+    const blockType = mcData.blocksByName[args[1]];
+    if (!blockType) {
+        bot.chat(`I don't know any blocks named ${args[1]}.`);
+        return;
+    }
 
-  const block = bot.findBlock({
-    matching: blockType.id,
-    maxDistance: 64
-  })
+    const block = bot.findBlock({
+        matching: blockType.id,
+        maxDistance: 64,
+    });
 
-  if (!block) {
-    bot.chat("I don't see that block nearby.")
-    return
-  }
+    if (!block) {
+        bot.chat("I don't see that block nearby.");
+        return;
+    }
 
-  const targets = bot.collectBlock.findFromVein(block)
-  try {
-    await bot.collectBlock.collect(targets)
-    // All blocks have been collected.
-    bot.chat('Done')
-  } catch (err) {
-    // An error occurred, report it.
-    bot.chat(err.message)
-    console.log(err)
-  }
-})
+    const targets = bot.collectBlock.findFromVein(block);
+    try {
+        await bot.collectBlock.collect(targets);
+        // All blocks have been collected.
+        bot.chat("Done");
+    } catch (err) {
+        // An error occurred, report it.
+        bot.chat(err.message);
+        console.log(err);
+    }
+});

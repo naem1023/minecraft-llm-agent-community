@@ -17,14 +17,14 @@ export type Callback = (err?: Error) => void;
 
 async function collectAll(
     bot: Bot,
-    options: CollectOptionsFull
+    options: CollectOptionsFull,
 ): Promise<void> {
     let success_count = 0;
     while (!options.targets.empty) {
         await emptyInventoryIfFull(
             bot,
             options.chestLocations,
-            options.itemFilter
+            options.itemFilter,
         );
         const closest = options.targets.getClosest();
         if (closest == null) break;
@@ -36,11 +36,11 @@ async function collectAll(
                     }
                     await bot.tool.equipForBlock(
                         closest as Block,
-                        equipToolOptions
+                        equipToolOptions,
                     );
                     const goal = new goals.GoalLookAtBlock(
                         closest.position,
-                        bot.world
+                        bot.world,
                     );
                     await bot.pathfinder.goto(goal);
                     await mineBlock(bot, closest as Block, options);
@@ -58,32 +58,41 @@ async function collectAll(
                         // @ts-ignore
                         if (err.name === "Invalid block") {
                             console.log(
-                                `Block ${closest.name} at ${closest.position} is not valid! Skip it!`
+                                `Block ${closest.name} at ${closest.position} is not valid! Skip it!`,
                             );
                         } // @ts-ignore
                         else if (err.name === "Unsafe block") {
                             console.log(
-                                `${closest.name} at ${closest.position} is not safe to break! Skip it!`
+                                `${closest.name} at ${closest.position} is not safe to break! Skip it!`,
                             );
                             // @ts-ignore
                         } else if (err.name === "NoItem") {
-                            const blockType = bot.registry.blocksByName[closest.name as keyof typeof bot.registry.blocksByName];
+                            const blockType =
+                                bot.registry.blocksByName[
+                                    closest.name as keyof typeof bot.registry.blocksByName
+                                ];
                             if (!blockType || !blockType.harvestTools) {
-                                bot.chat(`Cannot determine required tool for ${closest.name}! Skip it!`);
+                                bot.chat(
+                                    `Cannot determine required tool for ${closest.name}! Skip it!`,
+                                );
                                 return;
                             }
-                            
-                            const leastTool = Object.keys(blockType.harvestTools)[0];
+
+                            const leastTool = Object.keys(
+                                blockType.harvestTools,
+                            )[0];
                             const toolId = parseInt(leastTool);
                             const item = bot.registry.items[toolId];
-                            
+
                             if (!item) {
-                                bot.chat(`Cannot determine tool info for ${closest.name}! Skip it!`);
+                                bot.chat(
+                                    `Cannot determine tool info for ${closest.name}! Skip it!`,
+                                );
                                 return;
                             }
-                            
+
                             bot.chat(
-                                `I need at least a ${item.name} to mine ${closest.name}! Skip it!`
+                                `I need at least a ${item.name} to mine ${closest.name}! Skip it!`,
                             );
                             return;
                         } else if (
@@ -94,14 +103,14 @@ async function collectAll(
                         ) {
                             if (
                                 bot.entity.position.distanceTo(
-                                    closest.position
+                                    closest.position,
                                 ) < 0.5
                             ) {
                                 await mineBlock(bot, closest as Block, options);
                                 break;
                             }
                             console.log(
-                                `No path to ${closest.name} at ${closest.position}! Skip it!`
+                                `No path to ${closest.name} at ${closest.position}! Skip it!`,
                             );
                             // @ts-ignore
                         } else if (err.message === "Digging aborted") {
@@ -137,12 +146,12 @@ async function collectAll(
                                         tempEvents.cleanup();
                                         resolve();
                                     }
-                                }
+                                },
                             );
-                        }
+                        },
                     );
                     bot.pathfinder.setGoal(
-                        new goals.GoalFollow(closest as Entity, 0)
+                        new goals.GoalFollow(closest as Entity, 0),
                     );
                     // await bot.pathfinder.goto(new goals.GoalBlock(closest.position.x, closest.position.y, closest.position.z))
                     await waitForPickup;
@@ -166,7 +175,7 @@ async function collectAll(
             default: {
                 throw error(
                     "UnknownType",
-                    `Target ${closest.constructor.name} is not a Block or Entity!`
+                    `Target ${closest.constructor.name} is not a Block or Entity!`,
                 );
             }
         }
@@ -184,7 +193,7 @@ const equipToolOptions = {
 async function mineBlock(
     bot: Bot,
     block: Block,
-    options: CollectOptionsFull
+    options: CollectOptionsFull,
 ): Promise<void> {
     if (
         bot.blockAt(block.position)?.type !== block.type ||
@@ -359,7 +368,7 @@ export class CollectBlock {
     async collect(
         target: Collectable | Collectable[],
         options: CollectOptions | Callback = {},
-        cb?: Callback
+        cb?: Callback,
     ): Promise<void> {
         if (typeof options === "function") {
             cb = options;
@@ -380,14 +389,14 @@ export class CollectBlock {
         if (this.bot.pathfinder == null) {
             throw error(
                 "UnresolvedDependency",
-                "The mineflayer-collectblock plugin relies on the mineflayer-pathfinder plugin to run!"
+                "The mineflayer-collectblock plugin relies on the mineflayer-pathfinder plugin to run!",
             );
         }
 
         if (this.bot.tool == null) {
             throw error(
                 "UnresolvedDependency",
-                "The mineflayer-collectblock plugin relies on the mineflayer-tool plugin to run!"
+                "The mineflayer-collectblock plugin relies on the mineflayer-tool plugin to run!",
             );
         }
 
@@ -429,14 +438,14 @@ export class CollectBlock {
         block: Block,
         maxBlocks = 100,
         maxDistance = 16,
-        floodRadius = 1
+        floodRadius = 1,
     ): Block[] {
         return findFromVein(
             this.bot,
             block,
             maxBlocks,
             maxDistance,
-            floodRadius
+            floodRadius,
         );
     }
 
