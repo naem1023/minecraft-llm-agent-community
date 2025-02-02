@@ -1,27 +1,27 @@
-const winston = require("winston");
+const winston = require('winston')
 
 // Winston 로거 설정
 const logger = winston.createLogger({
-    level: "info",
+    level: 'info',
     format: winston.format.combine(
         winston.format.timestamp(),
-        winston.format.json(),
+        winston.format.json()
     ),
     transports: [
         // 파일에 로그 저장
         new winston.transports.File({
-            filename: "error.log",
-            level: "error",
+            filename: 'error.log',
+            level: 'error',
             format: winston.format.combine(
                 winston.format.timestamp(),
-                winston.format.json(),
+                winston.format.json()
             ),
         }),
         new winston.transports.File({
-            filename: "combined.log",
+            filename: 'combined.log',
             format: winston.format.combine(
                 winston.format.timestamp(),
-                winston.format.json(),
+                winston.format.json()
             ),
         }),
         // 콘솔 출력
@@ -31,16 +31,16 @@ const logger = winston.createLogger({
                 winston.format.timestamp(),
                 winston.format.printf(
                     (info) =>
-                        `[${info.timestamp}] [${info.level}]: ${info.message}`,
-                ),
+                        `[${info.timestamp}] [${info.level}]: ${info.message}`
+                )
             ),
         }),
     ],
-});
+})
 
 // 로깅 유틸리티 함수
 function logInfo(message, meta = {}) {
-    logger.info(message, meta);
+    logger.info(message, meta)
 }
 
 function logError(message, error = null) {
@@ -48,9 +48,9 @@ function logError(message, error = null) {
         logger.error(message, {
             error: error.message,
             stack: error.stack,
-        });
+        })
     } else {
-        logger.error(message);
+        logger.error(message)
     }
 }
 
@@ -58,4 +58,4 @@ module.exports = {
     logger,
     logInfo,
     logError,
-};
+}

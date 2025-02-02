@@ -8,7 +8,7 @@
     },
     "keywords": [],
     "author": "",
-    "license": "ISC",
+    "license": "MIT",
     "dependencies": {
         "body-parser": "^1.20.2",
         "express": "^4.19.2",
@@ -38,7 +38,6 @@
         "@eslint/js": "^9.19.0",
         "eslint": "^8.57.1",
         "eslint-config-prettier": "^10.0.1",
-        "eslint-plugin-prettier": "^5.2.3",
         "globals": "^15.14.0",
         "prettier": "3.4.2"
     }

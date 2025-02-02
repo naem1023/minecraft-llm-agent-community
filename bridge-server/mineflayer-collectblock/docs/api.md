@@ -6,10 +6,10 @@ Welcome to the _mineflayer-collectblock_ API documentation page.
 
 - [1. Summary](#1-summary)
 - [Properties](#properties)
-    - [`bot.collectblock.movements: Movements`](#botcollectblockmovements-movements)
+  - [`bot.collectblock.movements: Movements`](#botcollectblockmovements-movements)
 - [Functions](#functions)
-    - [collect](#collect)
-        - [Options:](#options)
+  - [collect](#collect)
+    - [Options:](#options)
 
 ## 1. Summary
 
@@ -37,16 +37,16 @@ Causes the bot to collect the given block, item drop, or list of those. If the t
 
 - `append: boolean`
 
-    If true, the target(s) will be appended to the existing target list instead of starting a new task. Defaults to false.
+  If true, the target(s) will be appended to the existing target list instead of starting a new task. Defaults to false.
 
 - `ignoreNoPath: boolean`
 
-    If true, errors will not be thrown when a path to the target block cannot be found. The bot will attempt to choose the best available position it can find, instead. Errors are still thrown if the bot cannot interact with the block from it's final location. Defaults to false.
+  If true, errors will not be thrown when a path to the target block cannot be found. The bot will attempt to choose the best available position it can find, instead. Errors are still thrown if the bot cannot interact with the block from it's final location. Defaults to false.
 
 - `chestLocations: Vec3[]`
 
-    Gets the list of chest locations to use when storing items after the bot's inventory becomes full. If undefined, it defaults to the chest location list on the bot.collectBlock plugin.
+  Gets the list of chest locations to use when storing items after the bot's inventory becomes full. If undefined, it defaults to the chest location list on the bot.collectBlock plugin.
 
 - `itemFilter: ItemFilter`
 
-    When transferring items to a chest, this filter is used to determine what items are allowed to be moved, and what items aren't allowed to be moved. Defaults to the item filter specified on the bot.collectBlock plugin.
+  When transferring items to a chest, this filter is used to determine what items are allowed to be moved, and what items aren't allowed to be moved. Defaults to the item filter specified on the bot.collectBlock plugin.
