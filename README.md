@@ -23,7 +23,10 @@ The purpose of this project can be changed, and welcome diverse opinions and fee
 - [x] Analysis Voyager baseline and make a detail architecture image and pseudo code
 - [x] Fix bugs, deprecated methods and modules for Voyager replication
 - [ ] Setup an architecture for multi-agent based on Voyager
-- [ ] Make simple multi agent 
+  - [x] Mineflayer bridge server can accept multiple bots
+  - [ ] Modify not to run and manage the Express server
+  - [ ] Establish complete js development environment, not only for the module as python
+  - [ ] Make a simple multi agent
 - [ ] Improve agent can learn and explore interactive skiils like fighting, talking, and so on.
 - [ ] Setup local llm via vllm or text-generation-inference
 - [ ] Setup monitoring system for multi-agent
