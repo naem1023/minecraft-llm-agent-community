@@ -2,6 +2,8 @@ const fs = require("fs");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mineflayer = require("mineflayer");
+const { logInfo, logError } = require("./lib/logger");
+const domain = require('domain');
 
 const skills = require("./lib/skillLoader");
 const { initCounter, getNextTime } = require("./lib/utils");
@@ -25,12 +27,14 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: false }));
 
 app.post("/start", (req, res) => {
     const botId = req.body.bot_name;
+    logInfo(`Received start request for bot ${botId}`);
 
     if (bots.has(botId)) {
+        logInfo(`Bot ${botId} already exists, restarting...`);
         onDisconnect(botId, "Restarting bot");
     }
 
-    console.log(req.body);
+    logInfo(`Creating bot ${botId} with config:`, req.body);
     const bot = mineflayer.createBot({
         host: "localhost",
         port: req.body.port,
@@ -40,7 +44,7 @@ app.post("/start", (req, res) => {
     });
 
     bots.set(botId, bot);
-    bot.once("error", (err) => onConnectionFailed(botId, err, res));
+    logInfo(`Bot ${botId} created and added to bots map`);
 
     // Event subscriptions
     bot.waitTicks = req.body.waitTicks;
@@ -49,7 +53,32 @@ app.post("/start", (req, res) => {
     bot.stuckPosList = [];
     bot.iron_pickaxe = false;
 
-    bot.on("kicked", () => onDisconnect(botId, "Bot was kicked"));
+    // 이벤트 리스너 추가
+    bot.on("login", () => {
+        logInfo(`Bot ${botId} logged in`);
+    });
+
+    bot.on("spawn", () => {
+        logInfo(`Bot ${botId} spawned`);
+    });
+
+    bot.on("death", () => {
+        logInfo(`Bot ${botId} died`);
+    });
+
+    bot.on("kicked", (reason) => {
+        logError(`Bot ${botId} was kicked. Reason:`, reason);
+        onDisconnect(botId, "Bot was kicked");
+    });
+
+    bot.on("end", () => {
+        logInfo(`Bot ${botId} connection ended`);
+        onDisconnect(botId, "Bot ended");
+    });
+
+    bot.on("error", (err) => {
+        logError(`Bot ${botId} encountered an error:`, err);
+    });
 
     // mounting will cause physicsTick to stop
     bot.on("mount", () => {
@@ -57,128 +86,145 @@ app.post("/start", (req, res) => {
     });
 
     bot.once("spawn", async () => {
-        bot.removeListener("error", (err) => onConnectionFailed(botId, err, res));
-        let itemTicks = 1;
-        if (req.body.reset === "hard") {
-            bot.chat("/clear @s");
-            bot.chat("/kill @s");
-            const inventory = req.body.inventory ? req.body.inventory : {};
-            const equipment = req.body.equipment
-                ? req.body.equipment
-                : [null, null, null, null, null, null];
-            for (let key in inventory) {
-                bot.chat(`/give @s minecraft:${key} ${inventory[key]}`);
-                itemTicks += 1;
-            }
-            const equipmentNames = [
-                "armor.head",
-                "armor.chest",
-                "armor.legs",
-                "armor.feet",
-                "weapon.mainhand",
-                "weapon.offhand",
-            ];
-            for (let i = 0; i < 6; i++) {
-                if (i === 4) continue;
-                if (equipment[i]) {
-                    bot.chat(
-                        `/item replace entity @s ${equipmentNames[i]} with minecraft:${equipment[i]}`
-                    );
-                    itemTicks += 1;
+        try {
+            logInfo(`Starting initialization for bot ${botId}`);
+            bot.removeListener("error", (err) => onConnectionFailed(botId, err, res));
+            let itemTicks = 1;
+
+            // 먼저 플러그인들을 로드
+            logInfo(`Loading plugins for bot ${botId}`);
+            const { pathfinder } = require("mineflayer-pathfinder");
+            const { Vec3 } = require("vec3");
+            const minecraftHawkEye = require("minecrafthawkeye");
+
+            bot.loadPlugin(pathfinder);
+            bot.loadPlugin(require("mineflayer-tool").plugin);
+            bot.loadPlugin(require("mineflayer-collectblock").plugin);
+            bot.loadPlugin(require("mineflayer-pvp").plugin);
+            bot.loadPlugin(minecraftHawkEye.default);
+            logInfo(`Plugins loaded for bot ${botId}`);
+
+            // 기본 게임룰 설정
+            logInfo(`Setting game rules for bot ${botId}`);
+            await bot.waitForTicks(bot.waitTicks);
+            await bot.waitForTicks(bot.waitTicks);
+
+            if (req.body.reset === "hard") {
+                logInfo(`Performing hard reset for bot ${botId}`);
+                bot.chat("/clear @s");
+                await bot.waitForTicks(bot.waitTicks);
+
+                const inventory = req.body.inventory ? req.body.inventory : {};
+                const equipment = req.body.equipment
+                    ? req.body.equipment
+                    : [null, null, null, null, null, null];
+
+                for (let key in inventory) {
+                    bot.chat(`/give @s minecraft:${key} ${inventory[key]}`);
+                    await bot.waitForTicks(bot.waitTicks);
+                }
+
+                const equipmentNames = [
+                    "armor.head",
+                    "armor.chest",
+                    "armor.legs",
+                    "armor.feet",
+                    "weapon.mainhand",
+                    "weapon.offhand",
+                ];
+                for (let i = 0; i < 6; i++) {
+                    if (i === 4) continue;
+                    if (equipment[i]) {
+                        bot.chat(
+                            `/item replace entity @s ${equipmentNames[i]} with minecraft:${equipment[i]}`
+                        );
+                        await bot.waitForTicks(bot.waitTicks);
+                    }
                 }
             }
+
+            // iron_pickaxe 체크
+            if (bot.inventory.items().find((item) => item.name === "iron_pickaxe")) {
+                bot.iron_pickaxe = true;
+            }
+
+            // 관찰 시스템 초기화
+            logInfo(`Initializing observation system for bot ${botId}`);
+            obs.inject(bot, [
+                OnChat,
+                OnError,
+                Voxels,
+                Status,
+                Inventory,
+                OnSave,
+                Chests,
+                BlockRecords,
+            ]);
+            skills.inject(bot);
+
+            initCounter(bot);
+
+            logInfo(`Bot ${botId} initialization completed successfully`);
+            res.json(bot.observe());
+
+        } catch (err) {
+            logError(`Error during bot ${botId} initialization:`, err);
+            onDisconnect(botId, "Initialization error");
+            res.status(500).json({ error: err.message });
         }
-
-        if (req.body.position) {
-            bot.chat(
-                `/tp @s ${req.body.position.x} ${req.body.position.y} ${req.body.position.z}`
-            );
-        }
-
-        // if iron_pickaxe is in bot's inventory
-        if (
-            bot.inventory.items().find((item) => item.name === "iron_pickaxe")
-        ) {
-            bot.iron_pickaxe = true;
-        }
-
-        const { pathfinder } = require("mineflayer-pathfinder");
-        const tool = require("mineflayer-tool").plugin;
-        const collectBlock = require("mineflayer-collectblock").plugin;
-        const pvp = require("mineflayer-pvp").plugin;
-        const minecraftHawkEye = require("minecrafthawkeye");
-
-        console.log(typeof minecraftHawkEye);
-        console.log(Object.prototype.toString.call(minecraftHawkEye));
-
-        console.log(typeof pvp);
-        console.log(Object.prototype.toString.call(pvp));
-
-
-        bot.loadPlugin(minecraftHawkEye.default);
-        bot.loadPlugin(pathfinder);
-        bot.loadPlugin(tool);
-        bot.loadPlugin(collectBlock);
-        bot.loadPlugin(pvp);
-
-        // bot.collectBlock.movements.digCost = 0;
-        // bot.collectBlock.movements.placeCost = 0;
-
-        obs.inject(bot, [
-            OnChat,
-            OnError,
-            Voxels,
-            Status,
-            Inventory,
-            OnSave,
-            Chests,
-            BlockRecords,
-        ]);
-        skills.inject(bot);
-
-        if (req.body.spread) {
-            bot.chat(`/spreadplayers ~ ~ 0 300 under 80 false @s`);
-            await bot.waitForTicks(bot.waitTicks);
-        }
-
-        await bot.waitForTicks(bot.waitTicks * itemTicks);
-        res.json(bot.observe());
-
-        initCounter(bot);
-        bot.chat("/gamerule keepInventory true");
-        bot.chat("/gamerule doDaylightCycle false");
     });
 
     function onConnectionFailed(botId, e, res) {
-        console.log(e);
+        logError(`Connection failed for bot ${botId}:`, e);
         bots.delete(botId);
         res.status(400).json({ error: e });
     }
     function onDisconnect(botId, message) {
         const bot = bots.get(botId);
         if (bot) {
+            logInfo(`Disconnecting bot ${botId}: ${message}`);
+            // 모든 이벤트 리스너 제거
+            bot.removeAllListeners('kicked');
+            bot.removeAllListeners('mount');
+            bot.removeAllListeners('physicsTick');
+            bot.removeAllListeners('chatEvent');
+            bot.removeAllListeners('error');
+
             if (bot.viewer) {
                 bot.viewer.close();
             }
             bot.end();
             console.log(`Bot ${botId}: ${message}`);
             bots.delete(botId);
+            logInfo(`Bot ${botId} cleanup completed`);
         }
     }
 });
 
 app.post("/step", async (req, res) => {
     const botId = req.body.bot_name;
+    logInfo(`Received step request for bot ${botId}`);
+    console.log(req.body);
+
     const bot = bots.get(botId);
+    let response_sent = false;
+    let mcData;
 
     if (!bot) {
+        logError(`Bot ${botId} not found for step request`);
         return res.status(404).json({ error: "Bot not found" });
     }
 
-    // import useful package
-    let response_sent = false;
+    function handleError(err) {
+        const error_message = err.toString();
+        if (err.stack) {
+            logError("Error stack:", err.stack);
+        }
+        return error_message;
+    }
+
     function otherError(err) {
-        console.log("Uncaught Error");
+        logError("Uncaught Error", err);
         bot.emit("error", handleError(err));
         bot.waitForTicks(bot.waitTicks).then(() => {
             if (!response_sent) {
@@ -188,95 +234,140 @@ app.post("/step", async (req, res) => {
         });
     }
 
-    process.on("uncaughtException", otherError);
+    try {
+        mcData = require("minecraft-data")(bot.version);
+        mcData.itemsByName["leather_cap"] = mcData.itemsByName["leather_helmet"];
+        mcData.itemsByName["leather_tunic"] =
+            mcData.itemsByName["leather_chestplate"];
+        mcData.itemsByName["leather_pants"] =
+            mcData.itemsByName["leather_leggings"];
+        mcData.itemsByName["leather_boots"] = mcData.itemsByName["leather_boots"];
+        mcData.itemsByName["lapis_lazuli_ore"] = mcData.itemsByName["lapis_ore"];
+        mcData.blocksByName["lapis_lazuli_ore"] = mcData.blocksByName["lapis_ore"];
 
-    const mcData = require("minecraft-data")(bot.version);
-    mcData.itemsByName["leather_cap"] = mcData.itemsByName["leather_helmet"];
-    mcData.itemsByName["leather_tunic"] =
-        mcData.itemsByName["leather_chestplate"];
-    mcData.itemsByName["leather_pants"] =
-        mcData.itemsByName["leather_leggings"];
-    mcData.itemsByName["leather_boots"] = mcData.itemsByName["leather_boots"];
-    mcData.itemsByName["lapis_lazuli_ore"] = mcData.itemsByName["lapis_ore"];
-    mcData.blocksByName["lapis_lazuli_ore"] = mcData.blocksByName["lapis_ore"];
-    const {
-        Movements,
-        goals: {
-            Goal,
-            GoalBlock,
-            GoalNear,
-            GoalXZ,
-            GoalNearXZ,
-            GoalY,
-            GoalGetToBlock,
-            GoalLookAtBlock,
-            GoalBreakBlock,
-            GoalCompositeAny,
-            GoalCompositeAll,
-            GoalInvert,
-            GoalFollow,
-            GoalPlaceBlock,
-        },
-        pathfinder,
-        Move,
-        ComputedPath,
-        PartiallyComputedPath,
-        XZCoordinates,
-        XYZCoordinates,
-        SafeBlock,
-        GoalPlaceBlockOptions,
-    } = require("mineflayer-pathfinder");
-    const { Vec3 } = require("vec3");
+        const {
+            Movements,
+            goals: {
+                Goal,
+                GoalBlock,
+                GoalNear,
+                GoalXZ,
+                GoalNearXZ,
+                GoalY,
+                GoalGetToBlock,
+                GoalLookAtBlock,
+                GoalBreakBlock,
+                GoalCompositeAny,
+                GoalCompositeAll,
+                GoalInvert,
+                GoalFollow,
+                GoalPlaceBlock,
+            },
+            pathfinder,
+            Move,
+            ComputedPath,
+            PartiallyComputedPath,
+            XZCoordinates,
+            XYZCoordinates,
+            SafeBlock,
+            GoalPlaceBlockOptions,
+        } = require("mineflayer-pathfinder");
+        const { Vec3 } = require("vec3");
 
-    // Set up pathfinder
-    const movements = new Movements(bot, mcData);
-    bot.pathfinder.setMovements(movements);
+        // Set up pathfinder with bot-specific movements
+        const movements = new Movements(bot, mcData);
+        bot.pathfinder.setMovements(movements);
 
-    bot.globalTickCounter = 0;
-    bot.stuckTickCounter = 0;
-    bot.stuckPosList = [];
+        bot.globalTickCounter = 0;
+        bot.stuckTickCounter = 0;
+        bot.stuckPosList = [];
 
-    function onTick() {
-        bot.globalTickCounter++;
-        if (bot.pathfinder.isMoving()) {
-            bot.stuckTickCounter++;
-            if (bot.stuckTickCounter >= 100) {
-                onStuck(1.5);
-                bot.stuckTickCounter = 0;
+        function onTick() {
+            bot.globalTickCounter++;
+            if (bot.pathfinder.isMoving()) {
+                bot.stuckTickCounter++;
+                if (bot.stuckTickCounter >= 100) {
+                    onStuck(1.5);
+                    bot.stuckTickCounter = 0;
+                }
             }
         }
+
+        bot.on("physicsTick", onTick);
+
+        // initialize fail count
+        let _craftItemFailCount = 0;
+        let _killMobFailCount = 0;
+        let _mineBlockFailCount = 0;
+        let _placeItemFailCount = 0;
+        let _smeltItemFailCount = 0;
+
+        // Retrieve array form post body
+        const code = req.body.code || '';
+        const programs = req.body.programs || '';
+        bot.cumulativeObs = [];
+
+        await bot.waitForTicks(bot.waitTicks);
+        const r = await evaluateCode(code, programs);
+
+        if (r !== "success") {
+            bot.emit("error", handleError(r));
+        }
+
+        await returnItems();
+        await bot.waitForTicks(bot.waitTicks);
+
+        if (!response_sent) {
+            response_sent = true;
+            res.json(bot.observe());
+        }
+
+        bot.removeListener("physicsTick", onTick);
+    } catch (err) {
+        otherError(err);
     }
 
-    bot.on("physicsTick", onTick);
-
-    // initialize fail count
-    let _craftItemFailCount = 0;
-    let _killMobFailCount = 0;
-    let _mineBlockFailCount = 0;
-    let _placeItemFailCount = 0;
-    let _smeltItemFailCount = 0;
-
-    // Retrieve array form post bod
-    const code = req.body.code;
-    const programs = req.body.programs;
-    bot.cumulativeObs = [];
-    await bot.waitForTicks(bot.waitTicks);
-    const r = await evaluateCode(code, programs);
-    process.off("uncaughtException", otherError);
-    if (r !== "success") {
-        bot.emit("error", handleError(r));
+    async function returnItems() {
+        if (!mcData) return;
+        bot.chat("/gamerule doTileDrops false");
+        const crafting_table = bot.findBlock({
+            matching: mcData.blocksByName.crafting_table.id,
+            maxDistance: 128,
+        });
+        if (crafting_table) {
+            bot.chat(
+                `/setblock ${crafting_table.position.x} ${crafting_table.position.y} ${crafting_table.position.z} air destroy`
+            );
+            bot.chat("/give @s crafting_table");
+        }
+        const furnace = bot.findBlock({
+            matching: mcData.blocksByName.furnace.id,
+            maxDistance: 128,
+        });
+        if (furnace) {
+            bot.chat(
+                `/setblock ${furnace.position.x} ${furnace.position.y} ${furnace.position.z} air destroy`
+            );
+            bot.chat("/give @s furnace");
+        }
+        if (bot.inventoryUsed() >= 32) {
+            // if chest is not in bot's inventory
+            if (!bot.inventory.items().find((item) => item.name === "chest")) {
+                bot.chat("/give @s chest");
+            }
+        }
+        // if iron_pickaxe not in bot's inventory and bot.iron_pickaxe
+        if (
+            bot.iron_pickaxe &&
+            !bot.inventory.items().find((item) => item.name === "iron_pickaxe")
+        ) {
+            bot.chat("/give @s iron_pickaxe");
+        }
+        bot.chat("/gamerule doTileDrops true");
     }
-    await returnItems();
-    // wait for last message
-    await bot.waitForTicks(bot.waitTicks);
-    if (!response_sent) {
-        response_sent = true;
-        res.json(bot.observe());
-    }
-    bot.removeListener("physicsTick", onTick);
 
     async function evaluateCode(code, programs) {
-        // Echo the code produced for players to see it. Don't echo when the bot code is already producing dialog or it will double echo
+        if (!code || !programs) return "success";
         try {
             await eval("(async () => {" + programs + "\n" + code + "})()");
             return "success";
@@ -321,106 +412,6 @@ app.post("/step", async (req, res) => {
             bot.chat("/tp @s ~ ~1.25 ~");
         }
     }
-
-    function returnItems() {
-        bot.chat("/gamerule doTileDrops false");
-        const crafting_table = bot.findBlock({
-            matching: mcData.blocksByName.crafting_table.id,
-            maxDistance: 128,
-        });
-        if (crafting_table) {
-            bot.chat(
-                `/setblock ${crafting_table.position.x} ${crafting_table.position.y} ${crafting_table.position.z} air destroy`
-            );
-            bot.chat("/give @s crafting_table");
-        }
-        const furnace = bot.findBlock({
-            matching: mcData.blocksByName.furnace.id,
-            maxDistance: 128,
-        });
-        if (furnace) {
-            bot.chat(
-                `/setblock ${furnace.position.x} ${furnace.position.y} ${furnace.position.z} air destroy`
-            );
-            bot.chat("/give @s furnace");
-        }
-        if (bot.inventoryUsed() >= 32) {
-            // if chest is not in bot's inventory
-            if (!bot.inventory.items().find((item) => item.name === "chest")) {
-                bot.chat("/give @s chest");
-            }
-        }
-        // if iron_pickaxe not in bot's inventory and bot.iron_pickaxe
-        if (
-            bot.iron_pickaxe &&
-            !bot.inventory.items().find((item) => item.name === "iron_pickaxe")
-        ) {
-            bot.chat("/give @s iron_pickaxe");
-        }
-        bot.chat("/gamerule doTileDrops true");
-    }
-
-    function handleError(err) {
-        let stack = err.stack;
-        if (!stack) {
-            return err;
-        }
-        console.log(stack);
-        const final_line = stack.split("\n")[1];
-        const regex = /<anonymous>:(\d+):\d+\)/;
-
-        const programs_length = programs.split("\n").length;
-        let match_line = null;
-        for (const line of stack.split("\n")) {
-            const match = regex.exec(line);
-            if (match) {
-                const line_num = parseInt(match[1]);
-                if (line_num >= programs_length) {
-                    match_line = line_num - programs_length;
-                    break;
-                }
-            }
-        }
-        if (!match_line) {
-            return err.message;
-        }
-        let f_line = final_line.match(
-            /\((?<file>.*):(?<line>\d+):(?<pos>\d+)\)/
-        );
-        if (f_line && f_line.groups && fs.existsSync(f_line.groups.file)) {
-            const { file, line, pos } = f_line.groups;
-            const f = fs.readFileSync(file, "utf8").split("\n");
-            // let filename = file.match(/(?<=node_modules\\)(.*)/)[1];
-            let source = file + `:${line}\n${f[line - 1].trim()}\n `;
-
-            const code_source =
-                "at " +
-                code.split("\n")[match_line - 1].trim() +
-                " in your code";
-            return source + err.message + "\n" + code_source;
-        } else if (
-            f_line &&
-            f_line.groups &&
-            f_line.groups.file.includes("<anonymous>")
-        ) {
-            const { file, line, pos } = f_line.groups;
-            let source =
-                "Your code" +
-                `:${match_line}\n${code.split("\n")[match_line - 1].trim()}\n `;
-            let code_source = "";
-            if (line < programs_length) {
-                source =
-                    "In your program code: " +
-                    programs.split("\n")[line - 1].trim() +
-                    "\n";
-                code_source = `at line ${match_line}:${code
-                    .split("\n")
-                    [match_line - 1].trim()} in your code`;
-            }
-            return source + err.message + "\n" + code_source;
-        }
-        return err.message;
-    }
 });
 
 app.post("/stop", (req, res) => {
@@ -456,6 +447,26 @@ app.post("/pause", (req, res) => {
 
 const DEFAULT_PORT = 3000;
 const PORT = process.argv[2] || DEFAULT_PORT;
-app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
+
+const server = app.listen(PORT)
+    .on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            logError(`Port ${PORT} is already in use. Please use a different port.`);
+            process.exit(1);
+        } else {
+            logError('Server error:', err);
+            process.exit(1);
+        }
+    })
+    .on('listening', () => {
+        logInfo(`Server started on port ${PORT}`);
+    });
+
+// 프로세스 종료 시 서버 정리
+process.on('SIGTERM', () => {
+    server.close(() => {
+        logInfo('Server terminated');
+        process.exit(0);
+    });
 });
+
