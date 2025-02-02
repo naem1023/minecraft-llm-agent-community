@@ -74,7 +74,7 @@ app.post('/start', (req, res) => {
     })
 
     bot.on('error', (err) => {
-        logError(`Bot ${botId} encountered an error:`, err)
+        logError(`Bot ${botId} encountered an error: ${err}`, err)
     })
 
     // mounting will cause physicsTick to stop
@@ -94,12 +94,26 @@ app.post('/start', (req, res) => {
             const { pathfinder } = require('mineflayer-pathfinder')
             const minecraftHawkEye = require('minecrafthawkeye')
 
-            bot.loadPlugin(pathfinder)
-            bot.loadPlugin(require('mineflayer-tool').plugin)
-            bot.loadPlugin(require('mineflayer-collectblock').plugin)
-            bot.loadPlugin(require('mineflayer-pvp').plugin)
-            bot.loadPlugin(minecraftHawkEye.default)
-            logInfo(`Plugins loaded for bot ${botId}`)
+            try {
+                bot.loadPlugin(pathfinder)
+                bot.loadPlugin(require('mineflayer-tool').plugin)
+                bot.loadPlugin(require('mineflayer-collectblock').plugin)
+                bot.loadPlugin(require('mineflayer-pvp').plugin)
+
+                // minecraftHawkEye 플러그인 로딩 방식 수정
+                if (typeof minecraftHawkEye === 'function') {
+                    bot.loadPlugin(minecraftHawkEye)
+                } else if (minecraftHawkEye.default) {
+                    bot.loadPlugin(minecraftHawkEye.default)
+                } else {
+                    logError(`Invalid minecraftHawkEye plugin format for bot ${botId}`)
+                }
+
+                logInfo(`Plugins loaded successfully for bot ${botId}`)
+            } catch (err) {
+                logError(`Plugin loading error for bot ${botId}: ${err.message}`)
+                throw err
+            }
 
             // 기본 게임룰 설정
             logInfo(`Setting game rules for bot ${botId}`)
@@ -168,7 +182,7 @@ app.post('/start', (req, res) => {
             logInfo(`Bot ${botId} initialization completed successfully`)
             res.json(bot.observe())
         } catch (err) {
-            logError(`Error during bot ${botId} initialization:`, err)
+            logError(`Error during bot ${botId} initialization: ${err}`)
             onDisconnect(botId, 'Initialization error')
             res.status(500).json({ error: err.message })
         }
@@ -204,7 +218,15 @@ app.post('/start', (req, res) => {
 app.post('/step', async (req, res) => {
     const botId = req.body.bot_name
     logInfo(`Received step request for bot ${botId}`)
-    console.log(req.body)
+
+    // Add request timeout handling
+    res.setTimeout(120000, () => {
+        if (!response_sent) {
+            response_sent = true
+            logError(`Request timeout for bot ${botId}`)
+            res.status(504).json({ error: 'Request timeout' })
+        }
+    })
 
     const bot = bots.get(botId)
     let response_sent = false
@@ -212,27 +234,26 @@ app.post('/step', async (req, res) => {
 
     if (!bot) {
         logError(`Bot ${botId} not found for step request`)
-        return res.status(404).json({ error: 'Bot not found' })
+        return res.status(404).json({ error: `Step: Bot ${botId} not found` })
     }
 
-    function handleError(err) {
-        const error_message = err.toString()
-        if (err.stack) {
-            logError('Error stack:', err.stack)
+    // Add error handler for unexpected disconnections
+    const connectionErrorHandler = (err) => {
+        if (!response_sent) {
+            response_sent = true
+            logError(`Connection error for bot ${botId}:`, err)
+            res.status(500).json({ error: 'Connection error', details: err.message })
         }
-        return error_message
+        cleanup()
     }
 
-    function otherError(err) {
-        logError('Uncaught Error', err)
-        bot.emit('error', handleError(err))
-        bot.waitForTicks(bot.waitTicks).then(() => {
-            if (!response_sent) {
-                response_sent = true
-                res.json(bot.observe())
-            }
-        })
+    const cleanup = () => {
+        bot.removeListener('end', connectionErrorHandler)
+        bot.removeListener('error', connectionErrorHandler)
     }
+
+    bot.on('end', connectionErrorHandler)
+    bot.on('error', connectionErrorHandler)
 
     try {
         mcData = require('minecraft-data')(bot.version)
@@ -288,9 +309,15 @@ app.post('/step', async (req, res) => {
             res.json(bot.observe())
         }
 
+        cleanup()
         bot.removeListener('physicsTick', onTick)
     } catch (err) {
-        otherError(err)
+        if (!response_sent) {
+            response_sent = true
+            logError(`Error in step for bot ${botId}:`, err)
+            res.status(500).json({ error: err.message })
+        }
+        cleanup()
     }
 
     async function returnItems() {
@@ -399,7 +426,7 @@ app.post('/pause', (req, res) => {
     const bot = bots.get(botId)
 
     if (!bot) {
-        res.status(400).json({ error: 'Bot not found' })
+        res.status(400).json({ error: `Pause: Bot ${botId} not found` })
         return
     }
 

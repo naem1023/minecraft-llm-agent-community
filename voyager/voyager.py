@@ -113,7 +113,6 @@ class Voyager:
         self.env = VoyagerEnv(
             name=name if is_valid_name(name) else get_random_name(),
             mc_port=mc_port,
-            azure_login=azure_login,
             server_port=server_port,
             request_timeout=env_request_timeout,
         )
