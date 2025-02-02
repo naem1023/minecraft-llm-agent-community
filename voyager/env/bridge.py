@@ -17,6 +17,7 @@ from .process_monitor import SubprocessMonitor
 class VoyagerEnv(gym.Env):
     def __init__(
         self,
+        name: str,
         mc_port=None,
         azure_login=None,
         server_host="http://localhost",
@@ -35,7 +36,8 @@ class VoyagerEnv(gym.Env):
         self.server = f"{server_host}:{server_port}"
         self.server_port = server_port
         self.request_timeout = request_timeout
-        self.log_path = log_path
+        self.name: str = name
+        self.log_path: str = os.path.join(log_path, self.name)
         self.mineflayer = self.get_mineflayer_process(server_port)
         if azure_login:
             self.mc_instance = self.get_mc_instance()
@@ -71,9 +73,6 @@ class VoyagerEnv(gym.Env):
 
     def check_process(self):
         if self.mc_instance and not self.mc_instance.is_running:
-            # if self.mc_instance:
-            #     self.mc_instance.check_process()
-            #     if not self.mc_instance.is_running:
             print("Starting Minecraft server")
             self.mc_instance.run()
             self.mc_port = self.mc_instance.port
@@ -129,8 +128,8 @@ class VoyagerEnv(gym.Env):
     def reset(
         self,
         *,
-        seed=None,
-        options=None,
+        seed: int = None,
+        options: dict = None,
     ) -> Tuple[ObsType, Dict[str, Any]]:
         if options is None:
             options = {}
@@ -146,6 +145,7 @@ class VoyagerEnv(gym.Env):
             "spread": options.get("spread", False),
             "waitTicks": options.get("wait_ticks", 5),
             "position": options.get("position", None),
+            "bot_name": self.name,
         }
 
         self.unpause()

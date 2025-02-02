@@ -1,13 +1,8 @@
 import os
-
 from dotenv import load_dotenv
-
 from voyager.voyager import Voyager
 
-
 load_dotenv()
-
-print(os.system("node -v"))
 
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 model = "gpt-4o-mini"

@@ -13,6 +13,7 @@ from voyager.agents.skill import SkillManager
 from voyager.env.bridge import VoyagerEnv
 from voyager.utils.json_utils import json_dumps
 from voyager.utils.record_utils import EventRecorder
+from voyager.env.name import get_random_name
 
 
 # TODO: remove event memory
@@ -51,6 +52,7 @@ class Voyager:
         ckpt_dir: str = "ckpt",
         skill_library_dir: str = None,
         resume: bool = False,
+        name: str = None,
     ):
         """
         The main class for Voyager.
@@ -106,6 +108,7 @@ class Voyager:
         """
         # init env
         self.env = VoyagerEnv(
+            name=name if name else get_random_name(),
             mc_port=mc_port,
             azure_login=azure_login,
             server_port=server_port,
